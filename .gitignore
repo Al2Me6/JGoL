@@ -69,3 +69,10 @@ fabric.properties
 **/*.directory
 **/*.DS_Store
 **/*desktop.ini
+
+# Vscode
+.vscode
+.code-workspace
+
+# Java bytecode
+**/*.class
