@@ -4,12 +4,10 @@ public class Board {
     public Board(){
         int DEFAULT_SIZE = 15;
         cells = new Cell[DEFAULT_SIZE][DEFAULT_SIZE];
-        initialize();
     }
 
     public Board(int width, int height){
         cells = new Cell[width][height];
-        initialize();
     }
 
     public void evolve(){
@@ -17,7 +15,7 @@ public class Board {
 
     }
 
-    private void initialize(){
+    public void initialize(){
         // initialize cells randomly
 
     }
