@@ -1,5 +1,4 @@
 public class Cell {
-   public void kill()
-   {
-   }
+    public void kill(){
+    }
 }
