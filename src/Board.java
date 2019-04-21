@@ -2,8 +2,7 @@ public class Board {
     private Cell[][] cells;
 
     public Board(){
-        int DEFAULT_SIZE = 15;
-        cells = new Cell[DEFAULT_SIZE][DEFAULT_SIZE];
+        cells = new Cell[200][200];
     }
 
     public Board(int width, int height){
