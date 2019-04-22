@@ -13,36 +13,36 @@ The game is created on a grid (i.e. the board), where cells are generated and de
 * Any live cell with one or no neighbors dies from solitude (removed from grid)
 * Any live cell with 4+ neighbors dies by overpopulation (removed from grid)
 * Any live cell with 2 or 3 neighbors survives (remains the same in grid)
-* Any empty cell with three neighbors is populated (added to the grid) 
+* Any empty cell with three neighbors is populated (added to the grid)
 
-For each generation, the game iterates through each cell on the board, applies the four preceding rules, and change the state of the cells accordingly. 
+For each generation, the game iterates through each cell on the board, applies the four preceding rules, and change the state of the cells accordingly.
 
 At the very beginning, the user will choose the initially populated cells using the UI by clicking on specific cells in the grid, which will then turn black to indicate that the cell is alive (a dead cell is white). Then, the user will click a button to indicate that they are done with the initial layout. The user will then be presented with buttons to go to the next generation and to clear. The user may clear the board at any time and restart.
 
 ## Examples
 
-|Initial state|Final state|Explanation|
-|---|---|---|
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
+| Initial state | Final state | Explanation |
+| ------------- | ----------- | ----------- |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
+|               |             |             |
 
 ## Pseudocode
 
 ```
-class JGoL 
+class JGoL
     define main method
         create new UI called ui
         set the default close operation of ui to JFrame.EXIT_ON_CLOSE
         pack ui using ui.pack() (inherited from JFrame)
         make ui visible
-        
+
 
 class UI extends JFrame
 
@@ -59,7 +59,7 @@ class UI extends JFrame
                 set btn's color to green
 
     implement a button listener class named NextGenBtnListener
-        call board.evolve() 
+        call board.evolve()
         call this.printBoard()
 
     implement a button listener class named ClearBtnListener
@@ -96,7 +96,7 @@ class UI extends JFrame
                         if(board.getCell(x, y) is true)
                             set btn color to green
                         otherwise set the color white
-        
+
 
 class Board
     define private variable Cell[][] named grid
@@ -118,7 +118,7 @@ class Board
 
     method applyRules with arguments x, y and return type boolean
         define integer count as countLiveNeighbors(x, y)
-        
+
         // All the cases
         if getCell(x, y) returns true
             if count equals 0 or count equals 1
