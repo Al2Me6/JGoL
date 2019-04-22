@@ -21,7 +21,7 @@ At the very beginning, the user will choose the initially populated cells using 
 
 ## Examples
 
-| Initial state | Final state | Explanation |
+| Initial state |  Next state | Explanation |
 | ------------- | ----------- | ----------- |
 |               |             |             |
 |               |             |             |
