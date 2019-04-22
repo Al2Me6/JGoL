@@ -131,7 +131,7 @@ class Board
             return true // cell is born
         return false // A new cell cannot be born, so return empty/dead cell
 
-    method countLiveNeighbors with arguments x, y and returnf type integer
+    method countLiveNeighbors with arguments x, y and return type integer
         define integer count as 0
         from integer i = -1 to i = 1
             from integer j = -1 to j = 1
