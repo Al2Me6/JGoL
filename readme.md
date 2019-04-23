@@ -1,4 +1,4 @@
-# (More Sane) Project Plan
+# Project Plan: JGoL (Java Game of Life)
 
 Alvin Meng, Autin Mitra, Connor Mooney
 
@@ -11,7 +11,7 @@ The goal of the project is to implement John Conway’s Game of Life in Java. It
 The game is created on a grid (i.e. the board), where cells are generated and destroyed based on four simple cases:
 
 * Any live cell with one or no neighbors dies from solitude (removed from grid)
-* Any live cell with 4+ neighbors dies by overpopulation (removed from grid)
+* Any live cell with 4+ neighbors dies from overpopulation (removed from grid)
 * Any live cell with 2 or 3 neighbors survives (remains the same in grid)
 * Any empty cell with three neighbors is populated (added to the grid)
 
@@ -27,6 +27,7 @@ At the very beginning, the user will choose the initially populated cells using 
 | ![image2](/img/2.png) | ![image3](/img/3.png) | The cells at the top and bottom have only one neighbor, so it is removed. A cell is added in the middle, as it has three neighbors (top, bottom, right). The cell at the right stays as there are two neighboring cells (top and bottom).
 | ![image4](/img/4.png) | ![image5](/img/5.png) | For each “rod” of the initial shape, the following occurs: the top and bottom of the rod have no neighbors, so they die, while the left and right of the middle generate a new cell, as the whole rod serves as three neighbors. By doing this to each rod, the resultant pattern is generated. |
 | ![image5](/img/5.png) | ![image4](/img/4.png) | If an "evolution" is made from the previous new generation show above, you get the initial shape shown. These are cyclic cells, where the position and shapes are periodic over generations.
+| ![image6](/img/6.png) | ![image7](/img/7.png) | When a cell goes past the boundaries of the grid (which is specified by the user), the cell is ignored and has no effect on other cells. In this image, the orange represents an out of bounds section.
 
 ## Pseudocode
 
