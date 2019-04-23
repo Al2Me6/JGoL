@@ -173,7 +173,7 @@ class Cell
     public method getButton with no argument and return type JButton
         return button
 
-    private method colorize with no argument and no return:
+    private method colorize with no argument and no return
         if state is true:
             set button's color to black
         else:
