@@ -21,17 +21,12 @@ At the very beginning, the user will choose the initially populated cells using 
 
 ## Examples
 
-| Initial state | Next state | Explanation |
-| ------------- | ---------- | ----------- |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
-|               |            |             |
+| Initial state         | Next state            | Explanation
+| --------------------- | --------------------- | -----------
+| ![image0](/img/0.png) | ![image1](/img/1.png) | Since all alive cells have only one or no neighbor, they all die.
+| ![image2](/img/2.png) | ![image3](/img/3.png) | The cells at the top and bottom have only one neighbor, so it is removed. A cell is added in the middle, as it has three neighbors (top, bottom, right). The cell at the right stays as there are two neighboring cells (top and bottom).
+| ![image4](/img/4.png) | ![image5](/img/5.png) | For each “rod” of the initial shape, the following occurs: the top and bottom of the rod have no neighbors, so they die, while the left and right of the middle generate a new cell, as the whole rod serves as three neighbors. By doing this to each rod, the resultant pattern is generated. |
+| ![image5](/img/5.png) | ![image4](/img/4.png) | If an "evolution" is made from the previous new generation show above, you get the initial shape shown. These are cyclic cells, where the position and shapes are periodic over generations.
 
 ## Pseudocode
 
@@ -49,23 +44,24 @@ class UI extends JFrame
     define private Board board
 
     // scrollable grid container for cells
-    private class ScrollGridPanel extends JPanel
+    // scrolling is necessary in case too many cells to fit on screen
+    private class ScrollableButtonGrid extends JPanel
         define private GridLayout grid
-        define private JScrollPanel sPanel
-        define private GridLayoutPanel gPanel
+        define private JScrollPanel scrollPanel
+        define private GridLayoutPanel gridPanel
 
         constructor with arguments w, h
             set grid width and height to w, h
-            set the layout of gPanel to grid
-            add gPanel to sPanel
-            enable vertical and horizontal scroll on sPanel
-            add sPanel to UI
+            set the layout of gridPanel to grid
+            add gridPanel to scrollPanel
+            enable vertical and horizontal scroll on scrollPanel
+            add scrollPanel to UI
 
         define method addToGrid() with argument JButton btn
-            add btn to gPanel
+            add btn to gridPanel
 
     // control next generation and clear buttons
-    private class ControlPanel extends JPanel
+    private class Controls extends JPanel
         implement a button listener class named NextGenBtnListener
             call board.evolve()
 
@@ -73,25 +69,23 @@ class UI extends JFrame
             call board.clear()
 
         constructor with no argument and no return
-            create a JButton called nextGenBtn
-            create a JButton called clearBtn
+            create 2 JButtons: nextGen and clear
             set nextGenBtn's listener to NextGenBtnListener
             set clearBtn's listener to ClearBtnListener
             add nextGenBtn and clearBtn to UI
 
     constructor with no argument
-        call JFrame superclass constructor with argument "JGoL"
-        ask user for the width and height via a JOptionPane prompt
-        set board as a new Board(width, height)
+        create a new JFrame with title "JGoL"
+        prompt user for the width and height with JOptionPane
+        create a new Board named board with width and height as inputted by the user
         // creating the grid
-        create a ScrollGridPanel of (width, height) named scrollGridPanel
-        for x = 0 to board.getHeight() - 1
-            for y = 0 to board.getWidth() - 1
-                call scrollGridPanel.addToGrid() with argument board.getButton(x, y)
-        add ScrollGridPanel to UI
+        create a ScrollableButtonGrid of (width, height) named scrollableButtonGrid
+        for each cell x, y in board
+            add the cell's button to the corresponding coordinate on scrollableButtonGrid
+        add scrollableButtonGrid to UI
         // creating the button control panel
-        create a ControlPanel named controlPanel
-        add controlPanel to UI
+        create a Controls named controls
+        add controls to UI
 
 // abstracts grids of cells
 class Board
@@ -99,11 +93,11 @@ class Board
     define private integers w, h
 
     constructor with arguments width and height
-        set grid to be an array of Cell[width][height]
+        set grid to be an array of Cell[width][height] //should we rename grid? not the most descriptive and also confusing with gridLayout
         set w, h as width and height
 
     public method getCellState with arguments x, y and return type boolean
-        return grid[x][y].getState
+        return grid[x][y].getState()
 
     public method setCellState with arguments x, y, and boolean s
         grid[x][y].setState(s)
@@ -198,18 +192,18 @@ public class JGoL {
 }
 
 public class UI extends JFrame {
-    private class ScrollGridPanel extends JPanel {
-        public ScrollGridPanel(int w, int h) {}
+    private class ScrollableButtonGrid extends JPanel {
+        public ScrollableButtonGrid(int w, int h) {}
         public addToGrid(JButton btn) {}
     }
-    private class ControlPanel extends JPanel {
+    private class Controls extends JPanel {
         private class NextGenBtnListener {
             public void actionPerformed(ActionEvent e) {}
         }
         private class ClearBtnListener {
             public void actionPerformed(ActionEvent e) {}
         }
-        public ControlPanel() {}
+        public Controls() {}
     }
     public UI() {}
     private void printBoard() {}
