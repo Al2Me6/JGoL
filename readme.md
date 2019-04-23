@@ -83,18 +83,19 @@ class UI extends JFrame
         create a ScrollableButtonGrid of (width, height) named scrollableButtonGrid
         for each cell x, y in board
             add the cell's button to the corresponding coordinate on scrollableButtonGrid
+            set the button's size to 5x5
         add scrollableButtonGrid to UI
         // creating the button control panel
         create a Controls named controls
         add controls to UI
 
-// abstracts grids of cells
+// abstraction for grid of cells
 class Board
     define private Cell[][] grid
     define private integers w, h
 
     constructor with arguments width and height
-        set grid to be an array of Cell[width][height] //should we rename grid? not the most descriptive and also confusing with gridLayout
+        set grid to be an array of Cell[width][height]
         set w, h as width and height
 
     public method getCellState with arguments x, y and return type boolean
