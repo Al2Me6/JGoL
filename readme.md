@@ -48,7 +48,7 @@ class UI extends JFrame
     // scrolling is necessary in case too many cells to fit on screen
     private class ScrollableButtonGrid extends JPanel
         define private GridLayout grid
-        define private JScrollPanel scrollPanel
+        define private JScrollPane scrollPanel
         define private GridLayoutPanel gridPanel
 
         constructor with arguments w, h
