@@ -7,9 +7,10 @@ public class UI extends JFrame {
 
     private class ScrollableButtonGrid extends JPanel {
         private JScrollPane scrollPane;
-        private Panel gridPanel;
+        private Panel  gridPanel;
 
         public ScrollableButtonGrid(int w, int h) {
+            gridPanel = new Panel();
             gridPanel.setLayout(new GridLayout(h, w));
             scrollPane = new JScrollPane(gridPanel);
             scrollPane.createHorizontalScrollBar();
