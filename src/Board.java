@@ -27,6 +27,14 @@ public class Board {
         return grid[x][y].getButton();
     }
 
+    public int getWidth() {
+        return w;
+    }
+
+    public int getHeight() {
+        return h;
+    }
+
     // TODO: Implement more efficient algorithm with data structures
     public void evolve() {
         boolean[][] nextGen = new boolean[w][h];
@@ -54,19 +62,19 @@ public class Board {
         int count = countLiveNeighbors(x, y);
         if (getCellState(x, y)) { // cell is alive
             switch (count) {
-                // death by solitude
-                case 0:
-                    return false;
-                case 1:
-                    return false;
-                // still alive
-                case 2:
-                    return true;
-                case 3:
-                    return true;
-                // more than 3 neighbors, death by overpopulation
-                default:
-                    return false;
+            // death by solitude
+            case 0:
+                return false;
+            case 1:
+                return false;
+            // still alive
+            case 2:
+                return true;
+            case 3:
+                return true;
+            // more than 3 neighbors, death by overpopulation
+            default:
+                return false;
             }
         }
         // cell is dead
