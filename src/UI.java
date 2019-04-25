@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class UI extends JFrame {
+public class UI extends JPanel {
     private Board board;
 
     private class ScrollableButtonGrid extends JPanel {
@@ -20,6 +20,7 @@ public class UI extends JFrame {
 
         public void addToGrid(JButton btn) {
             gridPanel.add(btn);
+            //scrollPane.setViewportView(gridPanel);
         }
     }
 
@@ -55,7 +56,7 @@ public class UI extends JFrame {
         for(int i = 0; i<width; i++){
             for( int j = 0; j<height; j++){
                 scrollableButtonGrid.addToGrid(board.getCellButton(i,j));
-                board.getCellButton(i,j).setSize(5,5);
+                board.getCellButton(i,j).setPreferredSize(new Dimension(10,10));
             }
         }
         add(scrollableButtonGrid);

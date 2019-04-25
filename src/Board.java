@@ -8,6 +8,11 @@ public class Board {
         grid = new Cell[x][y];
         w = x;
         h = y;
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                grid[i][j] = new Cell();
+            }
+        }
     }
 
     public boolean getCellState(int x, int y) {
@@ -49,19 +54,19 @@ public class Board {
         int count = countLiveNeighbors(x, y);
         if (getCellState(x, y)) { // cell is alive
             switch (count) {
-            // death by solitude
-            case 0:
-                return false;
-            case 1:
-                return false;
-            // still alive
-            case 2:
-                return true;
-            case 3:
-                return true;
-            // more than 3 neighbors, death by overpopulation
-            default:
-                return false;
+                // death by solitude
+                case 0:
+                    return false;
+                case 1:
+                    return false;
+                // still alive
+                case 2:
+                    return true;
+                case 3:
+                    return true;
+                // more than 3 neighbors, death by overpopulation
+                default:
+                    return false;
             }
         }
         // cell is dead
