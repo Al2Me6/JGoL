@@ -57,7 +57,6 @@ public class Board {
     }
 
     /**
-     * Getter for width
      * @return The width of the board
      */
     public int getWidth() {
@@ -65,7 +64,6 @@ public class Board {
     }
 
     /**
-     * Getter for height
      * @return The height of the board
      */
     public int getHeight() {
