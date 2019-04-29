@@ -1,9 +1,19 @@
 import javax.swing.JButton;
 
+/**
+ * Board class
+ * Abstraction for a grid of Cells
+ */
 public class Board {
     private Cell[][] grid;
     private int w, h;
+    private int generationCount;
 
+    /**
+     * Constructor for Board
+     * @param x Width of board
+     * @param y Height of board
+     */
     public Board(int x, int y) {
         grid = new Cell[x][y];
         w = x;
@@ -13,24 +23,51 @@ public class Board {
                 grid[i][j] = new Cell();
             }
         }
+        generationCount = 0;
     }
 
+    /**
+     * Get the state of a certain cell
+     * @param x The x-coordinate of the cell
+     * @param y The y-coordinate of the cell
+     * @return The state of the cell at (x, y)
+     */
     public boolean getCellState(int x, int y) {
         return grid[x][y].getState();
     }
 
+    /**
+     * Set the state of a certain cell
+     * @param x The x-coordinate of the cell
+     * @param y The y-coordinate of the cell
+     * @param s The state to set the cell at (x, y) to
+     */
     public void setCellState(int x, int y, boolean s) {
         grid[x][y].setState(s);
     }
 
+    /**
+     * Get the JButton of a certain cell
+     * @param x The x-coordinate of the cell
+     * @param y The y-coordinate of the cell
+     * @return The JButton associated with the cell at (x, y)
+     */
     public JButton getCellButton(int x, int y) {
         return grid[x][y].getButton();
     }
 
+    /**
+     * Getter for width
+     * @return The width of the board
+     */
     public int getWidth() {
         return w;
     }
 
+    /**
+     * Getter for height
+     * @return The height of the board
+     */
     public int getHeight() {
         return h;
     }
@@ -48,6 +85,7 @@ public class Board {
                 setCellState(i, j, nextGen[i][j]);
             }
         }
+        generationCount++;
     }
 
     public void clear() {
@@ -56,6 +94,7 @@ public class Board {
                 setCellState(i, j, false);
             }
         }
+        generationCount = 0;
     }
 
     private boolean applyRules(int x, int y) {
