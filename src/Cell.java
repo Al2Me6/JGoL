@@ -4,7 +4,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 /**
- * Cell class
  * An individual cell
  */
 public class Cell {
@@ -22,7 +21,6 @@ public class Cell {
     }
 
     /**
-     * Getter for state
      * @return The state of the cell
      */
     public boolean getState() {
@@ -30,7 +28,6 @@ public class Cell {
     }
 
     /**
-     * Setter for state
      * @param s New state to set
      */
     public void setState(boolean s) {
@@ -39,7 +36,6 @@ public class Cell {
     }
 
     /**
-     * Getter for button
      * @return The cell's JButton
      */
     public JButton getButton() {
@@ -58,8 +54,7 @@ public class Cell {
      */
     private class ToggleStateListener implements ActionListener {
         /**
-         * Implementation of actionPerformed
-         * Toggles state and updates color
+         * Implementation of actionPerformed Toggles state and updates color
          */
         public void actionPerformed(ActionEvent e) {
             state = !state;

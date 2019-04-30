@@ -1,8 +1,7 @@
 import javax.swing.JButton;
 
 /**
- * Board class
- * Abstraction for a grid of Cells
+ * Abstraction for a grid of Cells Handles game logic
  */
 public class Board {
     private Cell[][] grid;
@@ -11,6 +10,7 @@ public class Board {
 
     /**
      * Constructor for Board
+     *
      * @param x Width of board
      * @param y Height of board
      */
@@ -28,6 +28,7 @@ public class Board {
 
     /**
      * Get the state of a certain cell
+     *
      * @param x The x-coordinate of the cell
      * @param y The y-coordinate of the cell
      * @return The state of the cell at (x, y)
@@ -38,6 +39,7 @@ public class Board {
 
     /**
      * Set the state of a certain cell
+     *
      * @param x The x-coordinate of the cell
      * @param y The y-coordinate of the cell
      * @param s The state to set the cell at (x, y) to
@@ -48,6 +50,7 @@ public class Board {
 
     /**
      * Get the JButton of a certain cell
+     *
      * @param x The x-coordinate of the cell
      * @param y The y-coordinate of the cell
      * @return The JButton associated with the cell at (x, y)
@@ -70,7 +73,16 @@ public class Board {
         return h;
     }
 
-    // TODO: Implement more efficient algorithm with data structures
+    /**
+     * @return The current generation count
+     */
+    public int getGenerationCount() {
+        return generationCount;
+    }
+
+    /**
+     * Applies the four rules to each cell, update generation count
+     */
     public void evolve() {
         boolean[][] nextGen = new boolean[w][h];
         for (int i = 0; i < nextGen.length; i++) {
@@ -86,6 +98,9 @@ public class Board {
         generationCount++;
     }
 
+    /**
+     * Kill all cells and reset counter
+     */
     public void clear() {
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
@@ -95,6 +110,12 @@ public class Board {
         generationCount = 0;
     }
 
+    /**
+     * Internal method for applying rules to a single cell
+     *
+     * @param x The x coordinate of the cell
+     * @param y The y coordinate of the cell
+     */
     private boolean applyRules(int x, int y) {
         int count = countLiveNeighbors(x, y);
         if (getCellState(x, y)) { // cell is alive
@@ -120,6 +141,12 @@ public class Board {
         return false; // dead cell is still dead
     }
 
+    /**
+     * Internal method for counting live neighbors around a certain cell
+     *
+     * @param x The x coordinate of the cell
+     * @param y The y coordinate of the cell
+     */
     private int countLiveNeighbors(int x, int y) {
         int count = 0;
         // Check every cell around given coordinate

@@ -3,13 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
- * UI class
- * Manages UI components
+ * Manage UI components
  */
 public class UI extends JFrame {
     private Board board;
     private Controls controls;
-
 
     /**
      * Constructor for UI class
@@ -34,6 +32,7 @@ public class UI extends JFrame {
 
     /**
      * Sets the button size
+     *
      * @param px The button size in pixels
      */
     private void setButtonSize(int px) {
@@ -58,13 +57,13 @@ public class UI extends JFrame {
         public ScrollableButtonGrid(int w, int h) {
             gridPanel = new Panel();
             gridPanel.setLayout(new GridLayout(h, w));
-            scrollPane = new JScrollPane(gridPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-            add(scrollPane, BorderLayout.CENTER);
+
+            add(gridPanel);
         }
 
         /**
          * Adds buttons to the grid
+         *
          * @param btn A JButton to be added to the grid
          */
         public void addToGrid(JButton btn) {
@@ -73,16 +72,15 @@ public class UI extends JFrame {
     }
 
     /**
-     * UI Components with settings control
-     * Includes buttons for clearing, evolving, and autoevolving
+     * UI Components with settings control Includes buttons for clearing, evolving,
+     * and autoevolving
      */
     private class Controls extends JPanel {
         private JButton autoevolve;
         private JLabel generationCounter;
 
         /**
-         * The Constructor for controls
-         * Adds all the buttons
+         * The Constructor for controls Adds all the buttons
          */
         public Controls() {
             JButton nextGen = new JButton("Evolve state");
@@ -99,14 +97,14 @@ public class UI extends JFrame {
 
             generationCounter = new JLabel();
             add(generationCounter);
+            updateGenerationCounter();
         }
 
         /**
-         * Changes the generation num to specified number
-         * @param count The desired iteration being set
+         * Updates the generation counter
          */
-        public void setCounterCount(int count) {
-            generationCounter.setText(String.format("Current generation: %d", count));
+        private void updateGenerationCounter() {
+            generationCounter.setText(String.format("Current generation: %d", board.getGenerationCount()));
         }
 
         /**
@@ -116,6 +114,7 @@ public class UI extends JFrame {
             // On button click, evolve the board once
             public void actionPerformed(ActionEvent e) {
                 board.evolve();
+                updateGenerationCounter();
             }
         }
 
@@ -126,6 +125,7 @@ public class UI extends JFrame {
             // On button click, clear the board
             public void actionPerformed(ActionEvent e) {
                 board.clear();
+                updateGenerationCounter();
             }
         }
 
