@@ -1,10 +1,12 @@
+import java.util.HashSet;
+
 import javax.swing.JButton;
 
 /**
  * Abstraction for a grid of Cells Handles game logic
  */
 public class Board {
-    private Cell[][] grid;
+    private HashSet<Coordinate> cells;
     private int w, h;
     private int generationCount;
 
@@ -15,48 +17,26 @@ public class Board {
      * @param y Height of board
      */
     public Board(int x, int y) {
-        grid = new Cell[x][y];
+        cells = new HashSet<Coordinate>();
         w = x;
         h = y;
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                grid[i][j] = new Cell();
-            }
-        }
         generationCount = 0;
     }
 
-    /**
-     * Get the state of a certain cell
-     *
-     * @param x The x-coordinate of the cell
-     * @param y The y-coordinate of the cell
-     * @return The state of the cell at (x, y)
-     */
-    public boolean getCellState(int x, int y) {
-        return grid[x][y].getState();
+    public boolean getCellState(Coordinate c) {
+        return cells.contains(c);
     }
 
-    /**
-     * Set the state of a certain cell
-     *
-     * @param x The x-coordinate of the cell
-     * @param y The y-coordinate of the cell
-     * @param s The state to set the cell at (x, y) to
-     */
-    public void setCellState(int x, int y, boolean s) {
-        grid[x][y].setState(s);
+    public void setCellState(Coordinate c, boolean s) {
+        if (s) {
+            cells.add(c);
+        } else {
+            cells.remove(c);
+        }
     }
 
-    /**
-     * Get the JButton of a certain cell
-     *
-     * @param x The x-coordinate of the cell
-     * @param y The y-coordinate of the cell
-     * @return The JButton associated with the cell at (x, y)
-     */
-    public JButton getCellButton(int x, int y) {
-        return grid[x][y].getButton();
+    public void toggleState(Coordinate c) {
+        setCellState(c, !getCellState(c));
     }
 
     /**
@@ -84,17 +64,18 @@ public class Board {
      * Applies the four rules to each cell, update generation count
      */
     public void evolve() {
-        boolean[][] nextGen = new boolean[w][h];
-        for (int i = 0; i < nextGen.length; i++) {
-            for (int j = 0; j < nextGen[i].length; j++) {
-                nextGen[i][j] = applyRules(i, j);
+        HashSet<Coordinate> nextGen = new HashSet<>();
+        for (int i = 0; i < w; i++) {
+            for (int j = 0; j < h; j++) {
+                Coordinate c = new Coordinate(i, j);
+                if (applyRules(c)) {
+                    nextGen.add(c);
+                } else {
+                    cells.remove(c);
+                }
             }
         }
-        for (int i = 0; i < nextGen.length; i++) {
-            for (int j = 0; j < nextGen[i].length; j++) {
-                setCellState(i, j, nextGen[i][j]);
-            }
-        }
+        cells = nextGen;
         generationCount++;
     }
 
@@ -102,11 +83,7 @@ public class Board {
      * Kill all cells and reset counter
      */
     public void clear() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                setCellState(i, j, false);
-            }
-        }
+        cells.clear();
         generationCount = 0;
     }
 
@@ -116,9 +93,9 @@ public class Board {
      * @param x The x coordinate of the cell
      * @param y The y coordinate of the cell
      */
-    private boolean applyRules(int x, int y) {
-        int count = countLiveNeighbors(x, y);
-        if (getCellState(x, y)) { // cell is alive
+    private boolean applyRules(Coordinate c) {
+        int count = countLiveNeighbors(c);
+        if (cells.contains(c)) { // cell is alive
             switch (count) {
             // death by solitude
             case 0:
@@ -141,26 +118,17 @@ public class Board {
         return false; // dead cell is still dead
     }
 
-    /**
-     * Internal method for counting live neighbors around a certain cell
-     *
-     * @param x The x coordinate of the cell
-     * @param y The y coordinate of the cell
-     */
-    private int countLiveNeighbors(int x, int y) {
+
+    private int countLiveNeighbors(Coordinate c) {
         int count = 0;
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                try {
-                    if (getCellState(x + i, y + j))
-                        count++;
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    // Index outside of grid, meaning (x, y) on edge of grid. Can safely ignore
-                }
+                if (cells.contains(new Coordinate(c.getX() + i, c.getY() + j)))
+                    count++;
             }
         }
-        if (getCellState(x, y)) // don't count the cell itself as a neighbor
+        if (cells.contains(c)) // don't count the cell itself as a neighbor
             count--;
         return count;
     }

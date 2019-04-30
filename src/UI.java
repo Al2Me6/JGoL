@@ -16,31 +16,11 @@ public class UI extends JFrame {
         int width = Integer.parseInt(JOptionPane.showInputDialog(null, "Board width:"));
         int height = Integer.parseInt(JOptionPane.showInputDialog(null, "Board height:"));
         board = new Board(width, height);
-        // creating the grid
-        ScrollableButtonGrid scrollableButtonGrid = new ScrollableButtonGrid(width, height);
-        for (int i = 0; i < board.getWidth(); i++) {
-            for (int j = 0; j < board.getHeight(); j++) {
-                scrollableButtonGrid.addToGrid(board.getCellButton(i, j));
-            }
-        }
-        setButtonSize(20);
-        add(scrollableButtonGrid, BorderLayout.CENTER);
+        // button code here
+
         controls = new Controls();
         add(controls, BorderLayout.SOUTH);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-    }
-
-    /**
-     * Sets the button size
-     *
-     * @param px The button size in pixels
-     */
-    private void setButtonSize(int px) {
-        for (int i = 0; i < board.getWidth(); i++) {
-            for (int j = 0; j < board.getHeight(); j++) {
-                board.getCellButton(i, j).setPreferredSize(new Dimension(px, px));
-            }
-        }
     }
 
     /**
@@ -68,6 +48,27 @@ public class UI extends JFrame {
          */
         public void addToGrid(JButton btn) {
             gridPanel.add(btn);
+        }
+
+        private class ButtonGrid extends JPanel {
+            private JButton[][] buttons;
+
+            public ButtonGrid(int x, int y) {
+                buttons = new JButton[x][y];
+                for (int i = 0; i < h; i++) {
+                    for (int j = 0; j < w; j++) {
+                        buttons[i][j] = new JButton();
+                    }
+                }
+            }
+
+            private void setButtonSize(int px) {
+                for (int i = 0; i < board.getWidth(); i++) {
+                    for (int j = 0; j < board.getHeight(); j++) {
+                        board.getCellButton(i, j).setPreferredSize(new Dimension(px, px));
+                    }
+                }
+            }
         }
     }
 
