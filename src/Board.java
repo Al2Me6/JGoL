@@ -33,6 +33,7 @@ public class Board {
     }
 
     public void toggleState(Coordinate c) {
+        System.out.println("State of cell at " + c + " toggled.");
         setCellState(c, !getCellState(c));
     }
 
@@ -74,6 +75,13 @@ public class Board {
         }
         cells = nextGen;
         generationCount++;
+
+        // debug output
+        String output = "";
+        for (Coordinate c: cells) {
+            output += c;
+        }
+        System.out.println(output);
     }
 
     /**
@@ -110,9 +118,7 @@ public class Board {
             }
         }
         // cell is dead
-        if (count == 3) // new cell is born
-            return true;
-        return false; // dead cell is still dead
+        return count == 3; // revive dead cell if surrounded by exactly 3 neighbors
     }
 
 

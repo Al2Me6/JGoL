@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Manage UI components
@@ -19,7 +20,7 @@ public class UI extends JFrame {
         add(buttonGrid, BorderLayout.CENTER);
         controls = new Controls();
         add(controls, BorderLayout.SOUTH);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+//        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private class ButtonGrid extends JPanel {
@@ -27,7 +28,8 @@ public class UI extends JFrame {
         private Panel gridPanel;
 
         public ButtonGrid(Coordinate c) {
-            gridPanel = new Panel(new GridLayout(c.x(), c.y()));
+            gridPanel = new Panel();
+            gridPanel.setLayout(new GridLayout(c.x(), c.y()));
             buttons = new CellButton[c.x()][c.y()];
             for (int i = 0; i < c.x(); i++) {
                 for (int j = 0; j < c.y(); j++) {
@@ -48,7 +50,7 @@ public class UI extends JFrame {
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        board.toggleState(((CellButton) e.getSource()).getCoordinate());
+                        board.toggleState(coordinate);
                         colorize();
                     }
                 });
@@ -57,7 +59,7 @@ public class UI extends JFrame {
             }
 
             public void colorize() {
-                button.setForeground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
+                button.setBackground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
             }
 
             public void setButtonSize(int px) {

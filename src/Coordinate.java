@@ -15,6 +15,10 @@ public class Coordinate {
     }
 
     public boolean equals(Coordinate c) {
-        return (xCoordinate == c.x() && yCoordinate == c.y()) ? true : false;
+        return xCoordinate == c.x() && yCoordinate == c.y();
+    }
+
+    public String toString() {
+        return Integer.toString(xCoordinate) + "," + Integer.toString(yCoordinate);
     }
 }
