@@ -1,20 +1,20 @@
 public class Coordinate {
-    private final int X, Y;
+    private final int xCoordinate, yCoordinate;
 
     public Coordinate(int x, int y) {
-        X = x;
-        Y = y;
+        xCoordinate = x;
+        yCoordinate = y;
     }
 
-    public int getX() {
-        return X;
+    public int x() {
+        return xCoordinate;
     }
 
-    public int getY() {
-        return Y;
+    public int y() {
+        return yCoordinate;
     }
 
     public boolean equals(Coordinate c) {
-        return (X == c.getX() && Y == c.getY()) ? true : false;
+        return (xCoordinate == c.x() && yCoordinate == c.y()) ? true : false;
     }
 }

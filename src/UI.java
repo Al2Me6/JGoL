@@ -8,66 +8,64 @@ import java.awt.event.*;
 public class UI extends JFrame {
     private Board board;
     private Controls controls;
+    private Coordinate dimensions;
 
-    /**
-     * Constructor for UI class
-     */
     public UI() {
         int width = Integer.parseInt(JOptionPane.showInputDialog(null, "Board width:"));
         int height = Integer.parseInt(JOptionPane.showInputDialog(null, "Board height:"));
-        board = new Board(width, height);
-        // button code here
-
+        dimensions = new Coordinate(width, height);
+        board = new Board(dimensions);
+        ButtonGrid buttonGrid = new ButtonGrid(dimensions);
+        add(buttonGrid, BorderLayout.CENTER);
         controls = new Controls();
         add(controls, BorderLayout.SOUTH);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    /**
-     * A grid of buttons with scroll functionality
-     */
-    private class ScrollableButtonGrid extends JPanel {
+    private class ButtonGrid extends JPanel {
+        private CellButton[][] buttons;
         private Panel gridPanel;
-        private JScrollPane scrollPane;
 
-        /**
-         * @param w Width of the Grid
-         * @param h Height of the Grid
-         */
-        public ScrollableButtonGrid(int w, int h) {
-            gridPanel = new Panel();
-            gridPanel.setLayout(new GridLayout(h, w));
-
+        public ButtonGrid(Coordinate c) {
+            gridPanel = new Panel(new GridLayout(c.x(), c.y()));
+            buttons = new CellButton[c.x()][c.y()];
+            for (int i = 0; i < c.x(); i++) {
+                for (int j = 0; j < c.y(); j++) {
+                    buttons[i][j] = new CellButton(new Coordinate(i, j), 10);
+                    gridPanel.add(buttons[i][j]);
+                }
+            }
             add(gridPanel);
         }
 
-        /**
-         * Adds buttons to the grid
-         *
-         * @param btn A JButton to be added to the grid
-         */
-        public void addToGrid(JButton btn) {
-            gridPanel.add(btn);
-        }
+        private class CellButton extends JButton {
+            private JButton button;
+            private Coordinate coordinate;
 
-        private class ButtonGrid extends JPanel {
-            private JButton[][] buttons;
-
-            public ButtonGrid(int x, int y) {
-                buttons = new JButton[x][y];
-                for (int i = 0; i < h; i++) {
-                    for (int j = 0; j < w; j++) {
-                        buttons[i][j] = new JButton();
+            public CellButton(Coordinate c, int size) {
+                coordinate = c;
+                button = new JButton("");
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        board.toggleState(((CellButton) e.getSource()).getCoordinate());
+                        colorize();
                     }
-                }
+                });
+                colorize();
+                setButtonSize(size);
             }
 
-            private void setButtonSize(int px) {
-                for (int i = 0; i < board.getWidth(); i++) {
-                    for (int j = 0; j < board.getHeight(); j++) {
-                        board.getCellButton(i, j).setPreferredSize(new Dimension(px, px));
-                    }
-                }
+            public void colorize() {
+                button.setForeground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
+            }
+
+            public void setButtonSize(int px) {
+                button.setPreferredSize(new Dimension(px, px));
+            }
+
+            public Coordinate getCoordinate() {
+                return coordinate;
             }
         }
     }
@@ -85,15 +83,34 @@ public class UI extends JFrame {
          */
         public Controls() {
             JButton nextGen = new JButton("Evolve state");
-            nextGen.addActionListener(new NextGenBtnListener());
+            nextGen.addActionListener(new ActionListener() {
+                // On button click, evolve the board once
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    board.evolve();
+                    updateGenerationCounter();
+                }
+            });
             add(nextGen);
 
             JButton clear = new JButton("Clear board");
-            clear.addActionListener(new ClearBtnListener());
+            clear.addActionListener(new ActionListener() {
+                // On button click, clear the board
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    board.clear();
+                    updateGenerationCounter();
+                }
+            });
             add(clear);
 
             autoevolve = new JButton("Autoevolve");
-            autoevolve.addActionListener(new StartButtonListener());
+            autoevolve.addActionListener(new ActionListener() {
+                // On button click, start auto evolve
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                }
+            });
             add(autoevolve);
 
             generationCounter = new JLabel();
@@ -106,38 +123,6 @@ public class UI extends JFrame {
          */
         private void updateGenerationCounter() {
             generationCounter.setText(String.format("Current generation: %d", board.getGenerationCount()));
-        }
-
-        /**
-         * Button listener for the next generation button
-         */
-        private class NextGenBtnListener implements ActionListener {
-            // On button click, evolve the board once
-            public void actionPerformed(ActionEvent e) {
-                board.evolve();
-                updateGenerationCounter();
-            }
-        }
-
-        /**
-         * Button listener for the clear button
-         */
-        private class ClearBtnListener implements ActionListener {
-            // On button click, clear the board
-            public void actionPerformed(ActionEvent e) {
-                board.clear();
-                updateGenerationCounter();
-            }
-        }
-
-        /**
-         * Button listener for the start button
-         */
-        private class StartButtonListener implements ActionListener {
-            // On button click, start auto evolve
-            public void actionPerformed(ActionEvent e) {
-
-            }
         }
     }
 }

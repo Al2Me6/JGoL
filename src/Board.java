@@ -1,13 +1,11 @@
 import java.util.HashSet;
 
-import javax.swing.JButton;
-
 /**
  * Abstraction for a grid of Cells Handles game logic
  */
 public class Board {
     private HashSet<Coordinate> cells;
-    private int w, h;
+    private Coordinate dimensions;
     private int generationCount;
 
     /**
@@ -16,10 +14,9 @@ public class Board {
      * @param x Width of board
      * @param y Height of board
      */
-    public Board(int x, int y) {
+    public Board(Coordinate c) {
         cells = new HashSet<Coordinate>();
-        w = x;
-        h = y;
+        dimensions = c;
         generationCount = 0;
     }
 
@@ -43,14 +40,14 @@ public class Board {
      * @return The width of the board
      */
     public int getWidth() {
-        return w;
+        return dimensions.x();
     }
 
     /**
      * @return The height of the board
      */
     public int getHeight() {
-        return h;
+        return dimensions.y();
     }
 
     /**
@@ -65,8 +62,8 @@ public class Board {
      */
     public void evolve() {
         HashSet<Coordinate> nextGen = new HashSet<>();
-        for (int i = 0; i < w; i++) {
-            for (int j = 0; j < h; j++) {
+        for (int i = 0; i < dimensions.x(); i++) {
+            for (int j = 0; j < dimensions.y(); j++) {
                 Coordinate c = new Coordinate(i, j);
                 if (applyRules(c)) {
                     nextGen.add(c);
@@ -124,7 +121,7 @@ public class Board {
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (cells.contains(new Coordinate(c.getX() + i, c.getY() + j)))
+                if (cells.contains(new Coordinate(c.x() + i, c.y() + j)))
                     count++;
             }
         }
