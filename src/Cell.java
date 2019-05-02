@@ -14,39 +14,38 @@ public class Cell {
      * Constructor for Cell
      */
     public Cell() {
-        state = false;
+        System.out.println("Cell");
         button = new JButton();
-        button.addActionListener(new ToggleStateListener());
-        colorize();
     }
 
     /**
      * @return The state of the cell
      */
     public boolean getState() {
-        return state;
+        System.out.println("getState");
+        return true;
     }
 
     /**
      * @param s New state to set
      */
     public void setState(boolean s) {
-        state = s;
-        colorize();
+        System.out.println("setState");
     }
 
     /**
      * @return The cell's JButton
      */
     public JButton getButton() {
-        return button;
+        System.out.println("getButton");
+        return new JButton();
     }
 
     /**
      * Private method for changing color of button according to state
      */
     private void colorize() {
-        button.setBackground(state ? Color.black : Color.white);
+        System.out.println("colorize");
     }
 
     /**
@@ -57,8 +56,7 @@ public class Cell {
          * Implementation of actionPerformed Toggles state and updates color
          */
         public void actionPerformed(ActionEvent e) {
-            state = !state;
-            colorize();
+            System.out.println("ToggleStateListener.actionPerformed");
         }
     }
 }

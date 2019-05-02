@@ -15,14 +15,10 @@ public class Board {
      * @param y Height of board
      */
     public Board(int x, int y) {
+        System.out.println("Board");
         grid = new Cell[x][y];
         w = x;
         h = y;
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                grid[i][j] = new Cell();
-            }
-        }
         generationCount = 0;
     }
 
@@ -34,7 +30,8 @@ public class Board {
      * @return The state of the cell at (x, y)
      */
     public boolean getCellState(int x, int y) {
-        return grid[x][y].getState();
+        System.out.println("getCellState");
+        return true;
     }
 
     /**
@@ -45,7 +42,7 @@ public class Board {
      * @param s The state to set the cell at (x, y) to
      */
     public void setCellState(int x, int y, boolean s) {
-        grid[x][y].setState(s);
+        System.out.println("setCellState");
     }
 
     /**
@@ -56,58 +53,46 @@ public class Board {
      * @return The JButton associated with the cell at (x, y)
      */
     public JButton getCellButton(int x, int y) {
-        return grid[x][y].getButton();
+        System.out.println("getCellButton");
+        return new JButton();
     }
 
     /**
      * @return The width of the board
      */
     public int getWidth() {
-        return w;
+        System.out.println("getWidth");
+        return 0;
     }
 
     /**
      * @return The height of the board
      */
     public int getHeight() {
-        return h;
+        System.out.println("getHeight");
+        return 0;
     }
 
     /**
      * @return The current generation count
      */
     public int getGenerationCount() {
-        return generationCount;
+        System.out.println("getGenerationCount");
+        return 0;
     }
 
     /**
      * Applies the four rules to each cell, update generation count
      */
     public void evolve() {
-        boolean[][] nextGen = new boolean[w][h];
-        for (int i = 0; i < nextGen.length; i++) {
-            for (int j = 0; j < nextGen[i].length; j++) {
-                nextGen[i][j] = applyRules(i, j);
-            }
-        }
-        for (int i = 0; i < nextGen.length; i++) {
-            for (int j = 0; j < nextGen[i].length; j++) {
-                setCellState(i, j, nextGen[i][j]);
-            }
-        }
-        generationCount++;
+        System.out.println("evolve");
     }
 
     /**
      * Kill all cells and reset counter
      */
     public void clear() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
-                setCellState(i, j, false);
-            }
-        }
-        generationCount = 0;
+        System.out.println("clear");
     }
 
     /**
@@ -117,28 +102,9 @@ public class Board {
      * @param y The y coordinate of the cell
      */
     private boolean applyRules(int x, int y) {
+        System.out.println("applyRules");
         int count = countLiveNeighbors(x, y);
-        if (getCellState(x, y)) { // cell is alive
-            switch (count) {
-            // death by solitude
-            case 0:
-                return false;
-            case 1:
-                return false;
-            // still alive
-            case 2:
-                return true;
-            case 3:
-                return true;
-            // more than 3 neighbors, death by overpopulation
-            default:
-                return false;
-            }
-        }
-        // cell is dead
-        if (count == 3) // new cell is born
-            return true;
-        return false; // dead cell is still dead
+        return true;
     }
 
     /**
@@ -148,20 +114,8 @@ public class Board {
      * @param y The y coordinate of the cell
      */
     private int countLiveNeighbors(int x, int y) {
+        System.out.println("countLiveNeighbors");
         int count = 0;
-        // Check every cell around given coordinate
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                try {
-                    if (getCellState(x + i, y + j))
-                        count++;
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    // Index outside of grid, meaning (x, y) on edge of grid. Can safely ignore
-                }
-            }
-        }
-        if (getCellState(x, y)) // don't count the cell itself as a neighbor
-            count--;
         return count;
     }
 }
