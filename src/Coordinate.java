@@ -19,6 +19,6 @@ public class Coordinate {
     }
 
     public String toString() {
-        return Integer.toString(xCoordinate) + "," + Integer.toString(yCoordinate);
+        return xCoordinate + "," + yCoordinate;
     }
 }

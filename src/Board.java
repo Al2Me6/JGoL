@@ -1,39 +1,38 @@
 import java.util.HashSet;
 
 /**
- * Abstraction for a grid of Cells Handles game logic
+ * Abstraction for a grid of Cells
+ * Handles game logic
  */
 public class Board {
-    private HashSet<Coordinate> cells;
+    private HashSet<Coordinate> liveCells;
     private Coordinate dimensions;
     private int generationCount;
 
     /**
      * Constructor for Board
      *
-     * @param x Width of board
-     * @param y Height of board
+     * @param c: size of the board
      */
     public Board(Coordinate c) {
-        cells = new HashSet<Coordinate>();
+        liveCells = new HashSet<>();
         dimensions = c;
         generationCount = 0;
     }
 
     public boolean getCellState(Coordinate c) {
-        return cells.contains(c);
+        return liveCells.contains(c);
     }
 
     public void setCellState(Coordinate c, boolean s) {
         if (s) {
-            cells.add(c);
+            liveCells.add(c);
         } else {
-            cells.remove(c);
+            liveCells.remove(c);
         }
     }
 
     public void toggleState(Coordinate c) {
-        System.out.println("State of cell at " + c + " toggled.");
         setCellState(c, !getCellState(c));
     }
 
@@ -61,60 +60,58 @@ public class Board {
     /**
      * Applies the four rules to each cell, update generation count
      */
-    public void evolve() {
-        HashSet<Coordinate> nextGen = new HashSet<>();
+    public HashSet<Coordinate> evolve() {
+        HashSet<Coordinate> nextGen = clone(liveCells);
+        HashSet<Coordinate> delta = new HashSet<>();
         for (int i = 0; i < dimensions.x(); i++) {
             for (int j = 0; j < dimensions.y(); j++) {
                 Coordinate c = new Coordinate(i, j);
                 if (applyRules(c)) {
                     nextGen.add(c);
+                    delta.add(c);
                 } else {
-                    cells.remove(c);
+                    nextGen.remove(c);
+                    delta.add(c);
                 }
             }
         }
-        cells = nextGen;
+        liveCells = nextGen;
         generationCount++;
-
-        // debug output
-        String output = "";
-        for (Coordinate c: cells) {
-            output += c;
-        }
-        System.out.println(output);
+        return delta;
     }
 
     /**
-     * Kill all cells and reset counter
+     * Kill all liveCells and reset counter
      */
-    public void clear() {
-        cells.clear();
+    public HashSet<Coordinate> clear() {
+        HashSet<Coordinate> res = clone(liveCells);
+        liveCells.clear();
         generationCount = 0;
+        return res;
     }
 
     /**
      * Internal method for applying rules to a single cell
      *
-     * @param x The x coordinate of the cell
-     * @param y The y coordinate of the cell
+     * @param c The coordinates of the cell
      */
     private boolean applyRules(Coordinate c) {
         int count = countLiveNeighbors(c);
-        if (cells.contains(c)) { // cell is alive
+        if (liveCells.contains(c)) { // cell is alive
             switch (count) {
-            // death by solitude
-            case 0:
-                return false;
-            case 1:
-                return false;
-            // still alive
-            case 2:
-                return true;
-            case 3:
-                return true;
-            // more than 3 neighbors, death by overpopulation
-            default:
-                return false;
+                // death by solitude
+                case 0:
+                    return false;
+                case 1:
+                    return false;
+                // still alive
+                case 2:
+                    return true;
+                case 3:
+                    return true;
+                // more than 3 neighbors, death by overpopulation
+                default:
+                    return false;
             }
         }
         // cell is dead
@@ -123,16 +120,24 @@ public class Board {
 
 
     private int countLiveNeighbors(Coordinate c) {
-        int count = 0;
+        int ct = 0;
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (cells.contains(new Coordinate(c.x() + i, c.y() + j)))
-                    count++;
+                if (liveCells.contains(new Coordinate(c.x() + i, c.y() + j)))
+                    ct++;
             }
         }
-        if (cells.contains(c)) // don't count the cell itself as a neighbor
-            count--;
-        return count;
+        if (liveCells.contains(c)) // don't count the cell itself as a neighbor
+            ct--;
+        System.out.println(c.toString() + ": " + ct);
+        return ct;
+    }
+
+    private static HashSet<Coordinate> clone(HashSet<Coordinate> hs) {
+        HashSet<Coordinate> cloned = new HashSet<>();
+        for (Coordinate c : hs)
+            cloned.add(new Coordinate(c.x(), c.y()));
+        return cloned;
     }
 }

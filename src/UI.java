@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashSet;
 
 /**
  * Manage UI components
@@ -10,17 +11,18 @@ public class UI extends JFrame {
     private Board board;
     private Controls controls;
     private Coordinate dimensions;
+    private ButtonGrid buttonGrid;
 
     public UI() {
         int width = Integer.parseInt(JOptionPane.showInputDialog(null, "Board width:"));
         int height = Integer.parseInt(JOptionPane.showInputDialog(null, "Board height:"));
         dimensions = new Coordinate(width, height);
         board = new Board(dimensions);
-        ButtonGrid buttonGrid = new ButtonGrid(dimensions);
+        buttonGrid = new ButtonGrid(dimensions);
         add(buttonGrid, BorderLayout.CENTER);
         controls = new Controls();
         add(controls, BorderLayout.SOUTH);
-//        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
     private class ButtonGrid extends JPanel {
@@ -33,7 +35,7 @@ public class UI extends JFrame {
             buttons = new CellButton[c.x()][c.y()];
             for (int i = 0; i < c.x(); i++) {
                 for (int j = 0; j < c.y(); j++) {
-                    buttons[i][j] = new CellButton(new Coordinate(i, j), 10);
+                    buttons[i][j] = new CellButton(new Coordinate(i, j), 15);
                     gridPanel.add(buttons[i][j]);
                 }
             }
@@ -41,34 +43,37 @@ public class UI extends JFrame {
         }
 
         private class CellButton extends JButton {
-            private JButton button;
             private Coordinate coordinate;
 
             public CellButton(Coordinate c, int size) {
+                super("");
                 coordinate = c;
-                button = new JButton("");
-                button.addActionListener(new ActionListener() {
+                colorize();
+                setButtonSize(size);
+                addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         board.toggleState(coordinate);
                         colorize();
                     }
                 });
-                colorize();
-                setButtonSize(size);
             }
 
             public void colorize() {
-                button.setBackground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
+                setBackground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
             }
 
             public void setButtonSize(int px) {
-                button.setPreferredSize(new Dimension(px, px));
+                setPreferredSize(new Dimension(px, px));
             }
 
             public Coordinate getCoordinate() {
                 return coordinate;
             }
+        }
+
+        public void colorizeButton(Coordinate c) {
+            buttons[c.x()][c.y()].colorize();
         }
     }
 
@@ -89,7 +94,7 @@ public class UI extends JFrame {
                 // On button click, evolve the board once
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    board.evolve();
+                    updateBoard(board.evolve());
                     updateGenerationCounter();
                 }
             });
@@ -100,7 +105,7 @@ public class UI extends JFrame {
                 // On button click, clear the board
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    board.clear();
+                    updateBoard(board.clear());
                     updateGenerationCounter();
                 }
             });
@@ -125,6 +130,12 @@ public class UI extends JFrame {
          */
         private void updateGenerationCounter() {
             generationCounter.setText(String.format("Current generation: %d", board.getGenerationCount()));
+        }
+
+        private void updateBoard(HashSet<Coordinate> hs) {
+            for (Coordinate c : hs) {
+                buttonGrid.colorizeButton(c);
+            }
         }
     }
 }
