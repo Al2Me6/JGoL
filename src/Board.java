@@ -7,25 +7,25 @@ import java.util.HashSet;
 public class Board {
     private HashSet<Coordinate> liveCells;
     private Coordinate dimensions;
-    private int generationCount;
+    private int genCount;
 
     /**
      * Constructor for Board
      *
      * @param c: size of the board
      */
-    public Board(Coordinate c) {
+    public Board(Coordinate dim) {
         liveCells = new HashSet<>();
-        dimensions = c;
-        generationCount = 0;
+        dimensions = dim;
+        genCount = 0;
     }
 
     public boolean getCellState(Coordinate c) {
         return liveCells.contains(c);
     }
 
-    public void setCellState(Coordinate c, boolean s) {
-        if (s) {
+    public void setCellState(Coordinate c, boolean state) {
+        if (state) {
             liveCells.add(c);
         } else {
             liveCells.remove(c);
@@ -53,15 +53,15 @@ public class Board {
     /**
      * @return The current generation count
      */
-    public int getGenerationCount() {
-        return generationCount;
+    public int getGenCount() {
+        return genCount;
     }
 
     /**
      * Applies the four rules to each cell, update generation count
      */
     public HashSet<Coordinate> evolve() {
-        HashSet<Coordinate> nextGen = clone(liveCells);
+        HashSet<Coordinate> nextGen = deepcopy(liveCells);
         HashSet<Coordinate> delta = new HashSet<>();
         for (int i = 0; i < dimensions.x(); i++) {
             for (int j = 0; j < dimensions.y(); j++) {
@@ -76,7 +76,7 @@ public class Board {
             }
         }
         liveCells = nextGen;
-        generationCount++;
+        genCount++;
         return delta;
     }
 
@@ -84,9 +84,9 @@ public class Board {
      * Kill all liveCells and reset counter
      */
     public HashSet<Coordinate> clear() {
-        HashSet<Coordinate> res = clone(liveCells);
+        HashSet<Coordinate> res = deepcopy(liveCells);
         liveCells.clear();
-        generationCount = 0;
+        genCount = 0;
         return res;
     }
 
@@ -134,10 +134,10 @@ public class Board {
         return ct;
     }
 
-    private static HashSet<Coordinate> clone(HashSet<Coordinate> original) {
-        HashSet<Coordinate> cloned = new HashSet<>();
-        for (Coordinate c : original)
-            cloned.add(new Coordinate(c.x(), c.y()));
-        return cloned;
+    private static HashSet<Coordinate> deepcopy(HashSet<Coordinate> source) {
+        HashSet<Coordinate> copy = new HashSet<>();
+        for (Coordinate c : source)
+            copy.add(new Coordinate(c.x(), c.y()));
+        return copy;
     }
 }

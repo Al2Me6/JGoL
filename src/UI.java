@@ -92,7 +92,7 @@ public class UI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     updateBoard(board.evolve());
-                    updateGenerationCounter();
+                    updateGenCounter();
                 }
             });
             add(nextGen);
@@ -103,7 +103,7 @@ public class UI extends JFrame {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     updateBoard(board.clear());
-                    updateGenerationCounter();
+                    updateGenCounter();
                 }
             });
             add(clear);
@@ -118,15 +118,15 @@ public class UI extends JFrame {
             add(autoevolve);
 
             generationCounter = new JLabel();
-            updateGenerationCounter();
+            updateGenCounter();
             add(generationCounter);
         }
 
         /**
          * Update the generation counter
          */
-        private void updateGenerationCounter() {
-            generationCounter.setText(String.format("Current generation: %d", board.getGenerationCount()));
+        private void updateGenCounter() {
+            generationCounter.setText(String.format("Current generation: %d", board.getGenCount()));
         }
 
         private void updateBoard(HashSet<Coordinate> delta) {
