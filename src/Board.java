@@ -134,9 +134,9 @@ public class Board {
         return ct;
     }
 
-    private static HashSet<Coordinate> clone(HashSet<Coordinate> hs) {
+    private static HashSet<Coordinate> clone(HashSet<Coordinate> original) {
         HashSet<Coordinate> cloned = new HashSet<>();
-        for (Coordinate c : hs)
+        for (Coordinate c : original)
             cloned.add(new Coordinate(c.x(), c.y()));
         return cloned;
     }

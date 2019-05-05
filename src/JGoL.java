@@ -8,9 +8,9 @@ public class JGoL {
      * Run the game, creates UI JFrame
      */
     public static void main(String[] args) {
-        UI frame = new UI();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
+        UI ui = new UI();
+        ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ui.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        ui.setVisible(true);
     }
 }
