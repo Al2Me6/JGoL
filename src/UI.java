@@ -15,6 +15,16 @@ public class UI extends JFrame {
         int width = Integer.parseInt(JOptionPane.showInputDialog(null, "Board width:"));
         int height = Integer.parseInt(JOptionPane.showInputDialog(null, "Board height:"));
 
+        try {
+            UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         board = new Board(new Coordinate(width, height));
 
         buttonGrid = new ButtonGrid();
@@ -50,13 +60,11 @@ public class UI extends JFrame {
             public CellButton(Coordinate c, int size) {
                 coordinate = c;
                 setButtonSize(size);
+                setOpaque(true);
                 colorize();
-                addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        board.toggleState(coordinate);
-                        colorize();
-                    }
+                addActionListener(e -> {
+                    board.toggleState(coordinate);
+                    colorize();
                 });
             }
 
@@ -87,33 +95,24 @@ public class UI extends JFrame {
          */
         public Controls() {
             JButton nextGen = new JButton("Evolve state");
-            nextGen.addActionListener(new ActionListener() {
-                // On button click, evolve the board once
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    updateBoard(board.evolve());
-                    updateGenCounter();
-                }
+            // On button click, evolve the board once
+            nextGen.addActionListener(e -> {
+                updateBoard(board.evolve());
+                updateGenCounter();
             });
             add(nextGen);
 
             JButton clear = new JButton("Clear board");
-            clear.addActionListener(new ActionListener() {
-                // On button click, clear the board
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    updateBoard(board.clear());
-                    updateGenCounter();
-                }
+            // On button click, clear the board
+            clear.addActionListener(e -> {
+                updateBoard(board.clear());
+                updateGenCounter();
             });
             add(clear);
 
             autoevolve = new JButton("Autoevolve");
-            autoevolve.addActionListener(new ActionListener() {
-                // On button click, start auto evolve
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                }
+            // On button click, start auto evolve
+            autoevolve.addActionListener(e -> {
             });
             add(autoevolve);
 

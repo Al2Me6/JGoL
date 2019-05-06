@@ -12,7 +12,7 @@ public class Board {
     /**
      * Constructor for Board
      *
-     * @param c: size of the board
+     * @param dim: size of the board
      */
     public Board(Coordinate dim) {
         liveCells = new HashSet<>();
@@ -124,13 +124,13 @@ public class Board {
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (liveCells.contains(new Coordinate(c.x() + i, c.y() + j)))
+                if (liveCells.contains(new Coordinate(c.x() + i, c.y() + j))) {
                     ct++;
+                }
             }
         }
         if (liveCells.contains(c)) // don't count the cell itself as a neighbor
             ct--;
-        System.out.println(c.toString() + ": " + ct);
         return ct;
     }
 
