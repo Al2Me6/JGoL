@@ -37,11 +37,11 @@ public class UI extends JFrame {
 
         public ButtonGrid() {
             Panel gridPanel = new Panel();
-            gridPanel.setLayout(new GridLayout(board.getWidth(), board.getHeight()));
+            gridPanel.setLayout(new GridLayout(board.getHeight(), board.getWidth()));
 
-            buttons = new CellButton[board.getWidth()][board.getHeight()];
-            for (int i = 0; i < board.getWidth(); i++) {
-                for (int j = 0; j < board.getHeight(); j++) {
+            buttons = new CellButton[board.getHeight()][board.getWidth()];
+            for (int i = 0; i < board.getHeight(); i++) {
+                for (int j = 0; j < board.getWidth(); j++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), 15);
                     gridPanel.add(buttons[i][j]);
                 }

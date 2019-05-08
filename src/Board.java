@@ -6,8 +6,22 @@ import java.util.HashSet;
  */
 public class Board {
     private HashSet<Coordinate> liveCells;
-    private Coordinate dimensions;
+    private int width, height;
     private int genCount;
+
+    /**
+     * Constructor for Board
+     *
+     * @param w: Width of the board
+     * @param h: Height of the board
+     */
+
+    public Board(int w, int h) {
+        liveCells = new HashSet<>();
+        width = w;
+        height = h;
+        genCount = 0;
+    }
 
     /**
      * Constructor for Board
@@ -16,7 +30,8 @@ public class Board {
      */
     public Board(Coordinate dim) {
         liveCells = new HashSet<>();
-        dimensions = dim;
+        width = dim.x();
+        height = dim.y();
         genCount = 0;
     }
 
@@ -40,14 +55,14 @@ public class Board {
      * @return The width of the board
      */
     public int getWidth() {
-        return dimensions.x();
+        return width;
     }
 
     /**
      * @return The height of the board
      */
     public int getHeight() {
-        return dimensions.y();
+        return height;
     }
 
     /**
@@ -63,8 +78,8 @@ public class Board {
     public HashSet<Coordinate> evolve() {
         HashSet<Coordinate> nextGen = deepcopy(liveCells);
         HashSet<Coordinate> delta = new HashSet<>();
-        for (int i = 0; i < dimensions.x(); i++) {
-            for (int j = 0; j < dimensions.y(); j++) {
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
                 Coordinate c = new Coordinate(i, j);
                 if (applyRules(c)) {
                     nextGen.add(c);
