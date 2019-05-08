@@ -23,18 +23,6 @@ public class Board {
         genCount = 0;
     }
 
-    /**
-     * Constructor for Board
-     *
-     * @param dim: size of the board
-     */
-    public Board(Coordinate dim) {
-        liveCells = new HashSet<>();
-        width = dim.x();
-        height = dim.y();
-        genCount = 0;
-    }
-
     public boolean getCellState(Coordinate c) {
         return liveCells.contains(c);
     }
@@ -82,11 +70,11 @@ public class Board {
             for (int j = 0; j < getWidth(); j++) {
                 Coordinate c = new Coordinate(i, j);
                 if (applyRules(c)) {
-                    nextGen.add(c);
-                    delta.add(c);
+                    if (nextGen.add(c))
+                        delta.add(c);
                 } else {
-                    nextGen.remove(c);
-                    delta.add(c);
+                    if (nextGen.remove(c))
+                        delta.add(c);
                 }
             }
         }

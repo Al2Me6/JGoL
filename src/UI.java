@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashSet;
 
 /**
@@ -12,16 +10,7 @@ public class UI extends JFrame {
     private ButtonGrid buttonGrid;
 
     public UI() {
-        int width = Integer.parseInt(JOptionPane.showInputDialog(null, "Board width:"));
-        int height = Integer.parseInt(JOptionPane.showInputDialog(null, "Board height:"));
-
-        try {
-            UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
-        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-
-        board = new Board(new Coordinate(width, height));
+        board = new Board(userInput("Board width:"), userInput("Board height"));
 
         buttonGrid = new ButtonGrid();
         add(buttonGrid, BorderLayout.CENTER);
@@ -127,6 +116,16 @@ public class UI extends JFrame {
         private void updateBoard(HashSet<Coordinate> delta) {
             for (Coordinate c : delta)
                 buttonGrid.colorizeButton(c);
+        }
+    }
+
+    private int userInput(String question) {
+        while (true) {
+            try {
+                return Integer.parseInt(JOptionPane.showInputDialog(null, question));
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Please input a valid integer!", "Input Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

@@ -30,7 +30,8 @@ public class Coordinate {
         return Objects.hash(xCoordinate, yCoordinate);
     }
 
+    @Override
     public String toString() {
-        return xCoordinate + "," + yCoordinate;
+        return String.format("(%d, %d)", xCoordinate, yCoordinate);
     }
 }
