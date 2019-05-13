@@ -3,6 +3,12 @@ import java.util.Objects;
 public class Coordinate {
     private final int xCoordinate, yCoordinate;
 
+    /**
+     * Constructor for Coordinate
+     *
+     * @param x The x coordinate
+     * @param y The y coordinate
+     */
     public Coordinate(int x, int y) {
         xCoordinate = x;
         yCoordinate = y;

@@ -15,7 +15,7 @@ public class JGoL {
             e.printStackTrace();
         }
         ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ui.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        ui.setLocationRelativeTo(null);
         ui.setVisible(true);
     }
 }
