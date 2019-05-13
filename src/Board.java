@@ -77,15 +77,19 @@ public class Board {
     }
 
     /**
-     * Apply the four rules to each cell, update generation count
+     * Getter for compute time
      *
-     * @return HashSet of cells whose status has changed
+     * @return Last compute time in nanoseconds
      */
-
     public long getComputeTime() {
         return computeTime;
     }
 
+    /**
+     * Apply the four rules to each cell, update generation count
+     *
+     * @return HashSet of cells whose status has changed
+     */
     public HashSet<Coordinate> evolve() {
         long startTime = System.nanoTime();
         HashSet<Coordinate> add = new HashSet<>();
