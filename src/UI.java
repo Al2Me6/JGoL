@@ -1,5 +1,17 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import java.util.HashSet;
 
 /**
@@ -10,22 +22,18 @@ public class UI extends JFrame {
     private ButtonGrid buttonGrid;
     private final int INITIAL_BUTTON_SIZE = 15;
     private final Dimension STARTING_SIZE = new Dimension(800, 600);
-    private final int SCROLL_INCREMENT = 15;
 
+    /**
+     * Constructor for UI
+     */
     public UI() {
         board = new Board(userInput("Board width:"), userInput("Board height"));
 
         buttonGrid = new ButtonGrid();
-        JScrollPane scrollPane = new JScrollPane(buttonGrid);
-        scrollPane.getHorizontalScrollBar().addAdjustmentListener(e -> {
-            buttonGrid.refresh();
-        });
-        scrollPane.getVerticalScrollBar().addAdjustmentListener(e -> {
-            buttonGrid.refresh();
-        });
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(SCROLL_INCREMENT);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_INCREMENT);
-        add(scrollPane, BorderLayout.CENTER);
+        JScrollPane buttonGridScrollBox = new JScrollPane(buttonGrid);
+        buttonGridScrollBox.getHorizontalScrollBar().setUnitIncrement(15);
+        buttonGridScrollBox.getVerticalScrollBar().setUnitIncrement(15);
+        add(buttonGridScrollBox, BorderLayout.CENTER);
 
         Controls controls = new Controls();
         add(controls, BorderLayout.SOUTH);
@@ -34,29 +42,41 @@ public class UI extends JFrame {
         pack();
     }
 
+    /**
+     * A grid of buttons corresponding to cells
+     */
     private class ButtonGrid extends JPanel {
         private CellButton[][] buttons;
-        private JPanel gridPanel;
 
+        /**
+         * Constructor for ButtonGrid
+         */
         public ButtonGrid() {
-            gridPanel = new JPanel();
-            gridPanel.setLayout(new GridLayout(board.getHeight(), board.getWidth(), -1, -1));
+            setLayout(new GridLayout(board.getHeight(), board.getWidth(), -1, -1));
             buttons = new CellButton[board.getHeight()][board.getWidth()];
             for (int i = 0; i < board.getHeight(); i++) {
                 for (int j = 0; j < board.getWidth(); j++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
-                    gridPanel.add(buttons[i][j]);
+                    add(buttons[i][j]);
                 }
             }
-            add(gridPanel);
         }
 
+        /**
+         * A JButton with coordinate and color properties
+         */
         private class CellButton extends JButton {
             private Coordinate coordinate;
 
+            /**
+             * Constructor for CellButton
+             *
+             * @param c Coordinate that the button corresponds to
+             * @param size Initial size of the button
+             */
             public CellButton(Coordinate c, int size) {
                 coordinate = c;
-                setSize(size);
+                setPreferredSize(new Dimension(size, size));
                 setOpaque(true);
                 colorize();
                 addActionListener(e -> {
@@ -65,31 +85,35 @@ public class UI extends JFrame {
                 });
             }
 
+            /**
+             * Synchronize the color of the button according to the state of the corresponding cell
+             */
             public void colorize() {
                 setBackground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
             }
-
-            public void setSize(int px) {
-                setPreferredSize(new Dimension(px, px));
-                revalidate();
-                repaint();
-            }
         }
 
-        public void colorizeButtons(Coordinate c) {
+        /**
+         * Synchronize the color of a button according to the state of the corresponding cell
+         *
+         * @param c Coordinate of button to update
+         */
+        public void updateButtonColor(Coordinate c) {
             buttons[c.x()][c.y()].colorize();
         }
 
-        public void setButtonSize(int size) {
+        /**
+         * Change the size of all buttons
+         *
+         * @param size New size to be set
+         */
+        public void updateButtonSize(int size) {
             for (CellButton[] row : buttons) {
                 for (CellButton b : row)
-                    b.setSize(size);
+                    b.setPreferredSize(new Dimension(size, size));
             }
-        }
-
-        public void refresh() {
-            gridPanel.revalidate();
-            gridPanel.repaint();
+            revalidate();
+            repaint();
         }
     }
 
@@ -97,43 +121,44 @@ public class UI extends JFrame {
      * Control UI components
      */
     private class Controls extends JPanel {
-        private JButton autoevolve;
+        private JButton autoevolveButton;
         private JLabel genCounter;
-        private JSlider sizeSlider;
-        private boolean autoevolveState = false;
+        private boolean autoevolveEnabled = false;
+        private int autoevolveSpeed = 200;
 
         /**
          * Constructor for Controls
          */
         public Controls() {
-            setLayout(new GridLayout(3, 1));
+            setLayout(new GridLayout(4, 1));
+
+            genCounter = new JLabel();
+            genCounter.setHorizontalAlignment(SwingConstants.CENTER);
+            updateGenCounter();
+            add(genCounter);
 
             JPanel controlButtonsPanel = new JPanel(new FlowLayout());
 
             // On button click, evolve the board once
             JButton nextGen = new JButton("Evolve state");
-            nextGen.addActionListener(e -> {
-                evolve();
-            });
+            nextGen.addActionListener(ae -> evolveBoard());
             controlButtonsPanel.add(nextGen);
 
             // On button click, clear the board
             JButton clear = new JButton("Clear board");
-            clear.addActionListener(e -> {
-                clear();
-            });
+            clear.addActionListener(ae -> clearBoard());
             controlButtonsPanel.add(clear);
 
-            // On button click, start auto evolve
-            autoevolve = new JButton("Start autoevolve");
-            autoevolve.addActionListener(e -> {
-                autoevolveState = !autoevolveState;
-                if (autoevolveState) {
+            // On button click, start or stop autoevolve
+            autoevolveButton = new JButton();
+            autoevolveButton.addActionListener(ae -> {
+                autoevolveEnabled = !autoevolveEnabled;
+                if (autoevolveEnabled) {
                     Thread autoevolveThread = new Thread(() -> {
-                        while (autoevolveState) {
-                            evolve();
+                        while (autoevolveEnabled) {
+                            evolveBoard();
                             try {
-                                Thread.sleep(200);
+                                Thread.sleep(autoevolveSpeed);
                             } catch (InterruptedException ex) {
                             }
                         }
@@ -142,62 +167,77 @@ public class UI extends JFrame {
                 }
                 updateAutoevolveButtonText();
             });
-            controlButtonsPanel.add(autoevolve);
+            updateAutoevolveButtonText();
+            controlButtonsPanel.add(autoevolveButton);
 
             add(controlButtonsPanel);
 
-            genCounter = new JLabel();
-            genCounter.setHorizontalAlignment(SwingConstants.CENTER);
-            updateGenCounter();
-            add(genCounter);
+            JPanel autoevolveSpeedPanel = new JPanel(new FlowLayout());
 
-            JPanel sliderPanel = new JPanel(new FlowLayout());
+            autoevolveSpeedPanel.add(new JLabel("Autoevolve speed:"));
 
-            sliderPanel.add(new JLabel("Zoom: "));
+            JSlider autoevolveSpeedSlider = new JSlider(JSlider.HORIZONTAL, 50, 1050, autoevolveSpeed);
+            autoevolveSpeedSlider.setMinorTickSpacing(50);
+            autoevolveSpeedSlider.setMajorTickSpacing(200);
+            autoevolveSpeedSlider.setPaintTicks(true);
+            autoevolveSpeedSlider.addChangeListener(ce -> autoevolveSpeed = ((JSlider) ce.getSource()).getValue());
+            autoevolveSpeedPanel.add(autoevolveSpeedSlider);
 
-            sizeSlider = new JSlider(JSlider.HORIZONTAL, 5, 30, INITIAL_BUTTON_SIZE);
-            sizeSlider.setMinorTickSpacing(1);
-            sizeSlider.setMajorTickSpacing(5);
-            sizeSlider.setPaintTicks(true);
-            sizeSlider.setPaintLabels(true);
-            sizeSlider.addChangeListener(e -> {
-                buttonGrid.setButtonSize(((JSlider) e.getSource()).getValue());
-            });
-            sliderPanel.add(sizeSlider);
+            add(autoevolveSpeedPanel);
 
-            add(sliderPanel);
+            JPanel zoomPanel = new JPanel(new FlowLayout());
+
+            zoomPanel.add(new JLabel("Zoom:"));
+
+            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 5, 30, INITIAL_BUTTON_SIZE);
+            zoomSlider.setMinorTickSpacing(1);
+            zoomSlider.setMajorTickSpacing(5);
+            zoomSlider.setPaintTicks(true);
+            zoomSlider.setPaintLabels(true);
+            zoomSlider.addChangeListener(ce -> buttonGrid.updateButtonSize(((JSlider) ce.getSource()).getValue()));
+            zoomPanel.add(zoomSlider);
+
+            add(zoomPanel);
         }
 
-        private void evolve() {
+        private void evolveBoard() {
             if (SwingUtilities.isEventDispatchThread()) {
                 updateBoard(board.evolve());
             } else {
-                SwingUtilities.invokeLater(() -> {
-                    updateBoard(board.evolve());
-                });
+                SwingUtilities.invokeLater(() -> updateBoard(board.evolve()));
             }
         }
 
-        private void clear() {
-            autoevolveState = false;
+        /**
+         * Clear the board and stop autoevolve if enable
+         */
+        private void clearBoard() {
+            autoevolveEnabled = false;
             updateAutoevolveButtonText();
             updateBoard(board.clear());
         }
 
+        /**
+         * Display the correct autoevolve state
+         */
         private void updateAutoevolveButtonText() {
-            autoevolve.setText((autoevolveState ? "Stop" : "Start") + " autoevolve");
+            autoevolveButton.setText((autoevolveEnabled ? "Stop" : "Start") + " autoevolve");
         }
 
         /**
-         * Update the generation counter
+         * Synchronize the generation count with board
          */
         private void updateGenCounter() {
             genCounter.setText(String.format("Current generation: %d", board.getGenCount()));
         }
 
+        /**
+         * Synchronize buttons colors with board
+         * @param delta HashSet of cells whose status has changed
+         */
         private void updateBoard(HashSet<Coordinate> delta) {
             for (Coordinate c : delta)
-                buttonGrid.colorizeButtons(c);
+                buttonGrid.updateButtonColor(c);
             updateGenCounter();
         }
     }
@@ -211,9 +251,12 @@ public class UI extends JFrame {
     private int userInput(String question) {
         int count = 0;
         while (true) {
+            String input = JOptionPane.showInputDialog(this, question);
+            if (input == null)  // user clicked cancel
+                System.exit(1);
             try {
-                return Integer.parseInt(JOptionPane.showInputDialog(this, question));
-            } catch (NumberFormatException e) {
+                return Integer.parseInt(input);
+            } catch (NumberFormatException ex) {
                 if (count++ >= 3) {
                     JOptionPane.showMessageDialog(this, "Too many tries!", "Input Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(1);

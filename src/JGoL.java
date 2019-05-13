@@ -1,4 +1,5 @@
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 /**
  * Driver class
@@ -11,8 +12,8 @@ public class JGoL {
         UI ui = new UI();
         try {
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ui.setLocationRelativeTo(null);

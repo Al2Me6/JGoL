@@ -24,7 +24,7 @@ public class Board {
     /**
      * Getter for cell state
      *
-     * @return The current state of the cell
+     * @return Current state of the cell
      */
     public boolean getCellState(Coordinate c) {
         return liveCells.contains(c);
@@ -32,8 +32,8 @@ public class Board {
 
     /**
      * Setter for cell state
-     * @param c The coordinates of the cell
-     * @param state The desired state of the cell
+     * @param c Coordinates of the cell
+     * @param state Desired state of the cell
      */
     public void setCellState(Coordinate c, boolean state) {
         if (state) {
@@ -50,7 +50,7 @@ public class Board {
     /**
      * Getter for width
      *
-     * @return The width of the board
+     * @return Width of the board
      */
     public int getWidth() {
         return width;
@@ -59,7 +59,7 @@ public class Board {
     /**
      * Getter for height
      *
-     * @return The height of the board
+     * @return Height of the board
      */
     public int getHeight() {
         return height;
@@ -68,16 +68,16 @@ public class Board {
     /**
      * Getter for generation count
      *
-     * @return The current generation count
+     * @return Current generation count
      */
     public int getGenCount() {
         return genCount;
     }
 
     /**
-     * Applies the four rules to each cell, update generation count
+     * Apply the four rules to each cell, update generation count
      *
-     * @return The list of cells whose status has changed
+     * @return HashSet of cells whose status has changed
      */
     public HashSet<Coordinate> evolve() {
         HashSet<Coordinate> nextGen = deepcopy(liveCells);
@@ -102,7 +102,7 @@ public class Board {
     /**
      * Kill all live cells and reset counter
      *
-     * @return The list of cells whose status has changed
+     * @return HashSet of cells whose status has changed
      */
     public HashSet<Coordinate> clear() {
         HashSet<Coordinate> res = deepcopy(liveCells);
