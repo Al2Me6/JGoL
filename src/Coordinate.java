@@ -46,4 +46,9 @@ public class Coordinate {
     public int hashCode() {
         return Objects.hash(xCoordinate, yCoordinate);
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%d, %d)", xCoordinate, yCoordinate);
+    }
 }

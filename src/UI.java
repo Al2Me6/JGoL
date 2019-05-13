@@ -21,12 +21,14 @@ public class UI extends JFrame {
     private Board board;
     private ButtonGrid buttonGrid;
     private final int INITIAL_BUTTON_SIZE = 15;
-    private final Dimension STARTING_SIZE = new Dimension(800, 600);
+    private final Dimension STARTING_SIZE = new Dimension(1400, 900);
 
     /**
      * Constructor for UI
      */
     public UI() {
+        setTitle("JGoL");
+        setLayout(new BorderLayout());
         board = new Board(userInput("Board width:"), userInput("Board height"));
 
         buttonGrid = new ButtonGrid();
@@ -71,7 +73,7 @@ public class UI extends JFrame {
             /**
              * Constructor for CellButton
              *
-             * @param c Coordinate that the button corresponds to
+             * @param c    Coordinate that the button corresponds to
              * @param size Initial size of the button
              */
             public CellButton(Coordinate c, int size) {
@@ -123,6 +125,7 @@ public class UI extends JFrame {
     private class Controls extends JPanel {
         private JButton autoevolveButton;
         private JLabel genCounter;
+        private JLabel computeTimeLabel;
         private boolean autoevolveEnabled = false;
         private int autoevolveSpeed = 200;
 
@@ -130,7 +133,7 @@ public class UI extends JFrame {
          * Constructor for Controls
          */
         public Controls() {
-            setLayout(new GridLayout(4, 1));
+            setLayout(new FlowLayout());
 
             genCounter = new JLabel();
             genCounter.setHorizontalAlignment(SwingConstants.CENTER);
@@ -160,6 +163,7 @@ public class UI extends JFrame {
                             try {
                                 Thread.sleep(autoevolveSpeed);
                             } catch (InterruptedException ex) {
+                                ex.printStackTrace();
                             }
                         }
                     });
@@ -198,13 +202,21 @@ public class UI extends JFrame {
             zoomPanel.add(zoomSlider);
 
             add(zoomPanel);
+
+            computeTimeLabel = new JLabel();
+            updateComputeTimeLabel();
+            add(computeTimeLabel);
         }
 
         private void evolveBoard() {
             if (SwingUtilities.isEventDispatchThread()) {
                 updateBoard(board.evolve());
+                updateComputeTimeLabel();
             } else {
-                SwingUtilities.invokeLater(() -> updateBoard(board.evolve()));
+                SwingUtilities.invokeLater(() -> {
+                    updateBoard(board.evolve());
+                    updateComputeTimeLabel();
+                });
             }
         }
 
@@ -215,6 +227,7 @@ public class UI extends JFrame {
             autoevolveEnabled = false;
             updateAutoevolveButtonText();
             updateBoard(board.clear());
+            updateComputeTimeLabel();
         }
 
         /**
@@ -231,8 +244,12 @@ public class UI extends JFrame {
             genCounter.setText(String.format("Current generation: %d", board.getGenCount()));
         }
 
+        private void updateComputeTimeLabel() {
+            computeTimeLabel.setText(String.format("Compute time: %,dns", board.getComputeTime()));
+        }
         /**
          * Synchronize buttons colors with board
+         *
          * @param delta HashSet of cells whose status has changed
          */
         private void updateBoard(HashSet<Coordinate> delta) {
@@ -249,7 +266,7 @@ public class UI extends JFrame {
      * @return User's response
      */
     private int userInput(String question) {
-        int count = 0;
+        int ct = 0;
         while (true) {
             String input = JOptionPane.showInputDialog(this, question);
             if (input == null)  // user clicked cancel
@@ -257,7 +274,7 @@ public class UI extends JFrame {
             try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException ex) {
-                if (count++ >= 3) {
+                if (ct++ >= 3) {
                     JOptionPane.showMessageDialog(this, "Too many tries!", "Input Error", JOptionPane.ERROR_MESSAGE);
                     System.exit(1);
                 }

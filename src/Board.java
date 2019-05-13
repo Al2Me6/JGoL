@@ -7,6 +7,7 @@ public class Board {
     private HashSet<Coordinate> liveCells;
     private int width, height;
     private int genCount;
+    private long computeTime = 0;
 
     /**
      * Constructor for Board
@@ -32,7 +33,8 @@ public class Board {
 
     /**
      * Setter for cell state
-     * @param c Coordinates of the cell
+     *
+     * @param c     Coordinates of the cell
      * @param state Desired state of the cell
      */
     public void setCellState(Coordinate c, boolean state) {
@@ -79,24 +81,40 @@ public class Board {
      *
      * @return HashSet of cells whose status has changed
      */
+
+    public long getComputeTime() {
+        return computeTime;
+    }
+
     public HashSet<Coordinate> evolve() {
-        HashSet<Coordinate> nextGen = deepcopy(liveCells);
-        HashSet<Coordinate> delta = new HashSet<>();
-        for (int i = 0; i < getHeight(); i++) {
-            for (int j = 0; j < getWidth(); j++) {
-                Coordinate c = new Coordinate(i, j);
-                if (applyRules(c)) {
-                    if (nextGen.add(c))
-                        delta.add(c);
-                } else {
-                    if (nextGen.remove(c))
-                        delta.add(c);
+        long startTime = System.nanoTime();
+        HashSet<Coordinate> add = new HashSet<>();
+        HashSet<Coordinate> remove = new HashSet<>();
+        HashSet<Coordinate> tested = new HashSet<>();
+        for (Coordinate c : liveCells) {
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    Coordinate test = new Coordinate(c.x() + i, c.y() + j);
+                    if (!tested.add(test)) // if test is already a member of tested, skip
+                        continue;
+                    if (test.x() < 0 || test.y() < 0 || test.x() > width || test.y() > height) // within "array" bounds?
+                        continue;
+                    if (applyRules(test)) {
+                        if (!getCellState(test))
+                            add.add(test);
+                    } else {
+                        if (getCellState(test))
+                            remove.add(test);
+                    }
                 }
             }
         }
-        liveCells = nextGen;
+        liveCells.addAll(add);
+        liveCells.removeAll(remove);
         genCount++;
-        return delta;
+        computeTime = (System.nanoTime() - startTime);
+        add.addAll(remove); // overall delta
+        return add;
     }
 
     /**
@@ -105,10 +123,11 @@ public class Board {
      * @return HashSet of cells whose status has changed
      */
     public HashSet<Coordinate> clear() {
-        HashSet<Coordinate> res = deepcopy(liveCells);
+        HashSet<Coordinate> delta = deepcopy(liveCells);
         liveCells.clear();
         genCount = 0;
-        return res;
+        computeTime = 0;
+        return delta;
     }
 
     /**
@@ -150,12 +169,11 @@ public class Board {
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (liveCells.contains(new Coordinate(c.x() + i, c.y() + j))) {
+                if (getCellState(new Coordinate(c.x() + i, c.y() + j)))
                     ct++;
-                }
             }
         }
-        if (liveCells.contains(c)) // don't count the cell itself as a neighbor
+        if (getCellState(c)) // don't count the cell itself as a neighbor
             ct--;
         return ct;
     }
