@@ -101,7 +101,7 @@ public class Board {
                     Coordinate test = new Coordinate(c.x() + i, c.y() + j);
                     if (!tested.add(test)) // if test is already a member of tested, skip
                         continue;
-                    if (test.x() < 0 || test.y() < 0 || test.x() > width || test.y() > height) // within "array" bounds?
+                    if (!(test.x() > 0 && test.y() > 0 && test.x() < width && test.y() < height)) // within "array" bounds?
                         continue;
                     if (applyRules(test)) {
                         if (!getCellState(test))
@@ -116,7 +116,7 @@ public class Board {
         liveCells.addAll(add);
         liveCells.removeAll(remove);
         genCount++;
-        computeTime = (System.nanoTime() - startTime);
+        computeTime = System.nanoTime() - startTime;
         add.addAll(remove); // overall delta
         return add;
     }
