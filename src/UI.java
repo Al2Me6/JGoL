@@ -18,6 +18,7 @@ import java.util.HashSet;
  * Manage UI components
  */
 public class UI extends JFrame {
+    private int width, height;
     private Board board;
     private ButtonGrid buttonGrid;
     private final int INITIAL_BUTTON_SIZE = 15;
@@ -29,7 +30,11 @@ public class UI extends JFrame {
     public UI() {
         setTitle("JGoL");
         setLayout(new BorderLayout());
-        board = new Board(userInput("Board width:"), userInput("Board height"));
+
+        width = userInput("Board width:");
+        height = userInput("Board height");
+
+        board = new Board();
 
         buttonGrid = new ButtonGrid();
         JScrollPane buttonGridScrollBox = new JScrollPane(buttonGrid);
@@ -54,10 +59,10 @@ public class UI extends JFrame {
          * Constructor for ButtonGrid
          */
         public ButtonGrid() {
-            setLayout(new GridLayout(board.getHeight(), board.getWidth(), -1, -1));
-            buttons = new CellButton[board.getHeight()][board.getWidth()];
-            for (int i = 0; i < board.getHeight(); i++) {
-                for (int j = 0; j < board.getWidth(); j++) {
+            setLayout(new GridLayout(height, width, -1, -1));
+            buttons = new CellButton[height][width];
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
                     add(buttons[i][j]);
                 }
@@ -159,7 +164,7 @@ public class UI extends JFrame {
                 if (autoevolveEnabled) {
                     Thread autoevolveThread = new Thread(() -> {
                         while (autoevolveEnabled) {
-                            evolveBoard();
+                            SwingUtilities.invokeLater(this::evolveBoard);
                             try {
                                 Thread.sleep(autoevolveSpeed);
                             } catch (InterruptedException ex) {
@@ -209,15 +214,8 @@ public class UI extends JFrame {
         }
 
         private void evolveBoard() {
-            if (SwingUtilities.isEventDispatchThread()) {
-                updateBoard(board.evolve());
-                updateComputeTimeLabel();
-            } else {
-                SwingUtilities.invokeLater(() -> {
-                    updateBoard(board.evolve());
-                    updateComputeTimeLabel();
-                });
-            }
+            updateBoard(board.evolve());
+            updateComputeTimeLabel();
         }
 
         /**
@@ -247,14 +245,18 @@ public class UI extends JFrame {
         private void updateComputeTimeLabel() {
             computeTimeLabel.setText(String.format("Compute time: %,dns", board.getComputeTime()));
         }
+
         /**
          * Synchronize buttons colors with board
          *
          * @param delta HashSet of cells whose status has changed
          */
         private void updateBoard(HashSet<Coordinate> delta) {
-            for (Coordinate c : delta)
-                buttonGrid.updateButtonColor(c);
+            for (Coordinate c : delta) {
+                // array bounds may overflow here due to architecture of board
+                if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height)
+                    buttonGrid.updateButtonColor(c);
+            }
             updateGenCounter();
         }
     }

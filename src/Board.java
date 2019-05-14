@@ -5,20 +5,15 @@ import java.util.HashSet;
  */
 public class Board {
     private HashSet<Coordinate> liveCells;
-    private int width, height;
     private int genCount;
     private long computeTime = 0;
 
     /**
      * Constructor for Board
-     *
-     * @param w: Width of the board
-     * @param h: Height of the board
      */
-    public Board(int w, int h) {
+    public Board() {
         liveCells = new HashSet<>();
-        width = w;
-        height = h;
+
         genCount = 0;
     }
 
@@ -47,24 +42,6 @@ public class Board {
 
     public void toggleState(Coordinate c) {
         setCellState(c, !getCellState(c));
-    }
-
-    /**
-     * Getter for width
-     *
-     * @return Width of the board
-     */
-    public int getWidth() {
-        return width;
-    }
-
-    /**
-     * Getter for height
-     *
-     * @return Height of the board
-     */
-    public int getHeight() {
-        return height;
     }
 
     /**
@@ -100,8 +77,6 @@ public class Board {
                 for (int j = -1; j <= 1; j++) {
                     Coordinate test = new Coordinate(c.x() + i, c.y() + j);
                     if (!tested.add(test)) // if test is already a member of tested, skip
-                        continue;
-                    if (!(test.x() > 0 && test.y() > 0 && test.x() < width && test.y() < height)) // within "array" bounds?
                         continue;
                     if (applyRules(test)) {
                         if (!getCellState(test))
