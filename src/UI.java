@@ -84,6 +84,7 @@ public class UI extends JFrame {
             public CellButton(Coordinate c, int size) {
                 coordinate = c;
                 setPreferredSize(new Dimension(size, size));
+                setMaximumSize(new Dimension(size, size));
                 setOpaque(true);
                 colorize();
                 addActionListener(e -> {
@@ -116,8 +117,10 @@ public class UI extends JFrame {
          */
         public void updateButtonSize(int size) {
             for (CellButton[] row : buttons) {
-                for (CellButton b : row)
+                for (CellButton b : row) {
                     b.setPreferredSize(new Dimension(size, size));
+                    b.setMaximumSize(new Dimension(size, size));
+                }
             }
             revalidate();
             repaint();
@@ -198,7 +201,7 @@ public class UI extends JFrame {
 
             zoomPanel.add(new JLabel("Zoom:"));
 
-            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 5, 30, INITIAL_BUTTON_SIZE);
+            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 5, 20, INITIAL_BUTTON_SIZE);
             zoomSlider.setMinorTickSpacing(1);
             zoomSlider.setMajorTickSpacing(5);
             zoomSlider.setPaintTicks(true);
@@ -214,25 +217,15 @@ public class UI extends JFrame {
         }
 
         private void evolveBoard() {
-            updateBoard(board.evolve());
-            updateComputeTimeLabel();
+            updateGUI(board.evolve());
         }
 
         /**
-         * Clear the board and stop autoevolve if enable
+         * Clear the board and stop autoevolve if enabled
          */
         private void clearBoard() {
             autoevolveEnabled = false;
-            updateAutoevolveButtonText();
-            updateBoard(board.clear());
-            updateComputeTimeLabel();
-        }
-
-        /**
-         * Display the correct autoevolve state
-         */
-        private void updateAutoevolveButtonText() {
-            autoevolveButton.setText((autoevolveEnabled ? "Stop" : "Start") + " autoevolve");
+            updateGUI(board.clear());
         }
 
         /**
@@ -242,22 +235,31 @@ public class UI extends JFrame {
             genCounter.setText(String.format("Current generation: %d", board.getGenCount()));
         }
 
+        /**
+         * Display the correct autoevolve state
+         */
+        private void updateAutoevolveButtonText() {
+            autoevolveButton.setText((autoevolveEnabled ? "Stop" : "Start") + " autoevolve");
+        }
+
         private void updateComputeTimeLabel() {
             computeTimeLabel.setText(String.format("Compute time: %,dns", board.getComputeTime()));
         }
 
         /**
-         * Synchronize buttons colors with board
+         * Synchronize GUI with board
          *
          * @param delta HashSet of cells whose status has changed
          */
-        private void updateBoard(HashSet<Coordinate> delta) {
+        private void updateGUI(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 // array bounds may overflow here due to architecture of board
                 if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height)
                     buttonGrid.updateButtonColor(c);
             }
             updateGenCounter();
+            updateAutoevolveButtonText();
+            updateComputeTimeLabel();
         }
     }
 

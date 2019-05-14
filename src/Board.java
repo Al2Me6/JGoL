@@ -76,14 +76,14 @@ public class Board {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     Coordinate test = new Coordinate(c.x() + i, c.y() + j);
-                    if (!tested.add(test)) // if test is already a member of tested, skip
-                        continue;
-                    if (applyRules(test)) {
-                        if (!getCellState(test))
-                            add.add(test);
-                    } else {
-                        if (getCellState(test))
-                            remove.add(test);
+                    if (tested.add(test)) { // if test is already a member of tested, skip
+                        if (applyRules(test)) {
+                            if (!getCellState(test))
+                                add.add(test);
+                        } else {
+                            if (getCellState(test))
+                                remove.add(test);
+                        }
                     }
                 }
             }
