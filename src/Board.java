@@ -13,7 +13,6 @@ public class Board {
      */
     public Board() {
         liveCells = new HashSet<>();
-
         genCount = 0;
     }
 
@@ -97,8 +96,8 @@ public class Board {
         liveCells.addAll(add);
         liveCells.removeAll(remove);
         genCount++;
-        computeTime = System.nanoTime() - startTime;
         add.addAll(remove); // overall delta
+        computeTime = System.nanoTime() - startTime;
         return add;
     }
 
