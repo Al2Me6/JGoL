@@ -9,7 +9,7 @@ public class Board {
     private long computeTime = 0;
 
     /**
-     * Constructor for Board
+     * Initialize a blank board
      */
     public Board() {
         liveCells = new HashSet<>();
@@ -20,7 +20,8 @@ public class Board {
     /**
      * Getter for cell state
      *
-     * @return Current state of the cell
+     * @param c coordinates of the cell
+     * @return  current state of the cell
      */
     public boolean getCellState(Coordinate c) {
         return liveCells.contains(c);
@@ -29,8 +30,8 @@ public class Board {
     /**
      * Setter for cell state
      *
-     * @param c     Coordinates of the cell
-     * @param state Desired state of the cell
+     * @param c     coordinates of the cell
+     * @param state desired state of the cell
      */
     public void setCellState(Coordinate c, boolean state) {
         if (state) {
@@ -40,6 +41,11 @@ public class Board {
         }
     }
 
+    /**
+     * Flip the cell's state
+     *
+     * @param c coordinates of the cell
+     */
     public void toggleState(Coordinate c) {
         setCellState(c, !getCellState(c));
     }
@@ -47,7 +53,7 @@ public class Board {
     /**
      * Getter for generation count
      *
-     * @return Current generation count
+     * @return current generation count
      */
     public int getGenCount() {
         return genCount;
@@ -56,7 +62,7 @@ public class Board {
     /**
      * Getter for compute time
      *
-     * @return Last compute time in nanoseconds
+     * @return last compute time in nanoseconds
      */
     public long getComputeTime() {
         return computeTime;
@@ -112,7 +118,7 @@ public class Board {
     /**
      * Apply rules to a single cell
      *
-     * @param c The coordinates of the cell
+     * @param c the coordinates of the cell
      */
     private boolean applyRules(Coordinate c) {
         int count = countLiveNeighbors(c);
@@ -140,8 +146,8 @@ public class Board {
     /**
      * Count the number of live neighbors a cell has
      *
-     * @param c The coordinates of the cell
-     * @return The number of live cells
+     * @param c the coordinates of the cell
+     * @return  the number of live cells around that cell
      */
     private int countLiveNeighbors(Coordinate c) {
         int ct = 0;
@@ -160,7 +166,7 @@ public class Board {
     /**
      * Make a deep copy of a HashSet
      *
-     * @return A copy of the original HashSet
+     * @return a copy of the original HashSet
      */
     private static HashSet<Coordinate> deepcopy(HashSet<Coordinate> source) {
         HashSet<Coordinate> copy = new HashSet<>();

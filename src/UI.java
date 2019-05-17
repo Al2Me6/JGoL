@@ -25,7 +25,7 @@ public class UI extends JFrame {
     private final Dimension STARTING_SIZE = new Dimension(1400, 900);
 
     /**
-     * Constructor for UI
+     * Initialize the JGoL UI, create a board of a user-specified size
      */
     public UI() {
         setTitle("JGoL");
@@ -56,7 +56,7 @@ public class UI extends JFrame {
         private CellButton[][] buttons;
 
         /**
-         * Constructor for ButtonGrid
+         * Create a new ButtonGrid with size corresponding to board
          */
         public ButtonGrid() {
             setLayout(new GridLayout(height, width, -1, -1));
@@ -76,10 +76,10 @@ public class UI extends JFrame {
             private Coordinate coordinate;
 
             /**
-             * Constructor for CellButton
+             * Create a new CellButton at a certain location with a default size
              *
-             * @param c    Coordinate that the button corresponds to
-             * @param size Initial size of the button
+             * @param c    coordinate that the button corresponds to
+             * @param size initial size of the button
              */
             public CellButton(Coordinate c, int size) {
                 coordinate = c;
@@ -104,7 +104,7 @@ public class UI extends JFrame {
         /**
          * Synchronize the color of a button according to the state of the corresponding cell
          *
-         * @param c Coordinate of button to update
+         * @param c coordinate of button to update
          */
         public void updateButtonColor(Coordinate c) {
             buttons[c.x()][c.y()].colorize();
@@ -113,7 +113,7 @@ public class UI extends JFrame {
         /**
          * Change the size of all buttons
          *
-         * @param size New size to be set
+         * @param size new size to be set
          */
         public void updateButtonSize(int size) {
             for (CellButton[] row : buttons) {
@@ -128,79 +128,73 @@ public class UI extends JFrame {
     }
 
     /**
-     * Control UI components
+     * UI control elements
      */
     private class Controls extends JPanel {
-        private JButton autoevolveButton;
+        private JButton autoButton;
         private JLabel genCounter;
         private JLabel computeTimeLabel;
-        private boolean autoevolveEnabled = false;
-        private int autoevolveSpeed = 200;
+        private boolean autoEnabled = false;
+        private final int AUTO_SPEED_MIN = 50;
+        private final int AUTO_SPEED_MAX = 1250;
+        private int autoSpeed = 750;
 
         /**
-         * Constructor for Controls
+         * Initialize all control elements
          */
         public Controls() {
             setLayout(new FlowLayout());
 
+            // display current generation count
             genCounter = new JLabel();
             genCounter.setHorizontalAlignment(SwingConstants.CENTER);
-            updateGenCounter();
             add(genCounter);
-
-            JPanel controlButtonsPanel = new JPanel(new FlowLayout());
 
             // On button click, evolve the board once
             JButton nextGen = new JButton("Evolve state");
             nextGen.addActionListener(ae -> evolveBoard());
-            controlButtonsPanel.add(nextGen);
+            add(nextGen);
 
             // On button click, clear the board
             JButton clear = new JButton("Clear board");
             clear.addActionListener(ae -> clearBoard());
-            controlButtonsPanel.add(clear);
+            add(clear);
 
             // On button click, start or stop autoevolve
-            autoevolveButton = new JButton();
-            autoevolveButton.addActionListener(ae -> {
-                autoevolveEnabled = !autoevolveEnabled;
-                if (autoevolveEnabled) {
-                    Thread autoevolveThread = new Thread(() -> {
-                        while (autoevolveEnabled) {
+            autoButton = new JButton();
+            autoButton.addActionListener(ae -> {
+                autoEnabled = !autoEnabled;
+                if (autoEnabled) {
+                    Thread autoThread = new Thread(() -> {
+                        while (autoEnabled) {
                             SwingUtilities.invokeLater(this::evolveBoard);
                             try {
-                                Thread.sleep(autoevolveSpeed);
+                                Thread.sleep(AUTO_SPEED_MAX - (autoSpeed - AUTO_SPEED_MIN));
                             } catch (InterruptedException ex) {
                                 ex.printStackTrace();
                             }
                         }
                     });
-                    autoevolveThread.start();
+                    autoThread.start();
                 }
-                updateAutoevolveButtonText();
+                updateAutoButtonText();
             });
-            updateAutoevolveButtonText();
-            controlButtonsPanel.add(autoevolveButton);
+            add(autoButton);
 
-            add(controlButtonsPanel);
+            // change autoevolve speed
+            JPanel autoSpeedPanel = new JPanel(new FlowLayout());
+            autoSpeedPanel.add(new JLabel("Autoevolve speed:"));
+            JSlider autoSpeedSlider = new JSlider(JSlider.HORIZONTAL, AUTO_SPEED_MIN, AUTO_SPEED_MAX, autoSpeed);
+            autoSpeedSlider.setMinorTickSpacing(50);
+            autoSpeedSlider.setMajorTickSpacing(200);
+            autoSpeedSlider.setPaintTicks(true);
+            autoSpeedSlider.addChangeListener(ce -> autoSpeed = ((JSlider) ce.getSource()).getValue());
+            autoSpeedPanel.add(autoSpeedSlider);
+            add(autoSpeedPanel);
 
-            JPanel autoevolveSpeedPanel = new JPanel(new FlowLayout());
-
-            autoevolveSpeedPanel.add(new JLabel("Autoevolve speed:"));
-
-            JSlider autoevolveSpeedSlider = new JSlider(JSlider.HORIZONTAL, 50, 1050, autoevolveSpeed);
-            autoevolveSpeedSlider.setMinorTickSpacing(50);
-            autoevolveSpeedSlider.setMajorTickSpacing(200);
-            autoevolveSpeedSlider.setPaintTicks(true);
-            autoevolveSpeedSlider.addChangeListener(ce -> autoevolveSpeed = ((JSlider) ce.getSource()).getValue());
-            autoevolveSpeedPanel.add(autoevolveSpeedSlider);
-
-            add(autoevolveSpeedPanel);
-
+            // change button size, aka zoom
             JPanel zoomPanel = new JPanel(new FlowLayout());
-
             zoomPanel.add(new JLabel("Zoom:"));
-
             JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 5, 20, INITIAL_BUTTON_SIZE);
             zoomSlider.setMinorTickSpacing(1);
             zoomSlider.setMajorTickSpacing(5);
@@ -208,24 +202,13 @@ public class UI extends JFrame {
             zoomSlider.setPaintLabels(true);
             zoomSlider.addChangeListener(ce -> buttonGrid.updateButtonSize(((JSlider) ce.getSource()).getValue()));
             zoomPanel.add(zoomSlider);
-
             add(zoomPanel);
 
+            // display compute time for previous iteration
             computeTimeLabel = new JLabel();
-            updateComputeTimeLabel();
             add(computeTimeLabel);
-        }
 
-        private void evolveBoard() {
-            updateGUI(board.evolve());
-        }
-
-        /**
-         * Clear the board and stop autoevolve if enabled
-         */
-        private void clearBoard() {
-            autoevolveEnabled = false;
-            updateGUI(board.clear());
+            uiRefresh();
         }
 
         /**
@@ -238,27 +221,52 @@ public class UI extends JFrame {
         /**
          * Display the correct autoevolve state
          */
-        private void updateAutoevolveButtonText() {
-            autoevolveButton.setText((autoevolveEnabled ? "Stop" : "Start") + " autoevolve");
+        private void updateAutoButtonText() {
+            autoButton.setText((autoEnabled ? "Stop" : "Start") + " autoevolve");
         }
 
+        /**
+         * Get the most recent compute time
+         */
         private void updateComputeTimeLabel() {
             computeTimeLabel.setText(String.format("Compute time: %,dns", board.getComputeTime()));
         }
 
         /**
-         * Synchronize GUI with board
+         * Evolve the board one time
+         */
+        private void evolveBoard() {
+            fullRefresh(board.evolve());
+        }
+
+        /**
+         * Clear the board and stop autoevolve if enabled
+         */
+        private void clearBoard() {
+            autoEnabled = false;
+            fullRefresh(board.clear());
+        }
+
+        /**
+         * Synchronize the entire UI with board, including buttons
          *
          * @param delta HashSet of cells whose status has changed
          */
-        private void updateGUI(HashSet<Coordinate> delta) {
+        private void fullRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 // array bounds may overflow here due to architecture of board
                 if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height)
                     buttonGrid.updateButtonColor(c);
             }
+            uiRefresh();
+        }
+
+        /**
+         * Synchronize all UI controls with board
+         */
+        private void uiRefresh() {
             updateGenCounter();
-            updateAutoevolveButtonText();
+            updateAutoButtonText();
             updateComputeTimeLabel();
         }
     }
@@ -266,8 +274,8 @@ public class UI extends JFrame {
     /**
      * Asks the user a question, checking input
      *
-     * @param question Question to ask user
-     * @return User's response
+     * @param question question to ask user
+     * @return user's response
      */
     private int userInput(String question) {
         int ct = 0;

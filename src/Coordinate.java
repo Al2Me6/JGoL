@@ -4,7 +4,7 @@ public class Coordinate {
     private final int xCoordinate, yCoordinate;
 
     /**
-     * Constructor for Coordinate
+     * Create a new coordinate at (x, y)
      *
      * @param x x-coordinate
      * @param y y-coordinate
