@@ -38,8 +38,7 @@ public class Coordinate {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Coordinate that = (Coordinate) o;
-        return xCoordinate == that.xCoordinate &&
-                yCoordinate == that.yCoordinate;
+        return xCoordinate == that.xCoordinate && yCoordinate == that.yCoordinate;
     }
 
     @Override

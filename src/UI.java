@@ -1,17 +1,5 @@
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
 import java.util.HashSet;
 
 /**
@@ -169,6 +157,7 @@ public class UI extends JFrame {
                         while (autoEnabled) {
                             SwingUtilities.invokeLater(this::evolveBoard);
                             try {
+                                // "faster" refresh is numerically lower sleep time, so flip here
                                 Thread.sleep(AUTO_SPEED_MAX - (autoSpeed - AUTO_SPEED_MIN));
                             } catch (InterruptedException ex) {
                                 ex.printStackTrace();
@@ -255,8 +244,9 @@ public class UI extends JFrame {
         private void fullRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 // array bounds may overflow here due to architecture of board
-                if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height)
+                if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height) {
                     buttonGrid.updateButtonColor(c);
+                }
             }
             uiRefresh();
         }
@@ -281,8 +271,9 @@ public class UI extends JFrame {
         int ct = 0;
         while (true) {
             String input = JOptionPane.showInputDialog(this, question);
-            if (input == null)  // user clicked cancel
+            if (input == null) { // user clicked cancel
                 System.exit(1);
+            }
             try {
                 return Integer.parseInt(input);
             } catch (NumberFormatException ex) {

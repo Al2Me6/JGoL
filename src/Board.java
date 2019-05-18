@@ -20,7 +20,7 @@ public class Board {
      * Getter for cell state
      *
      * @param c coordinates of the cell
-     * @return  current state of the cell
+     * @return current state of the cell
      */
     public boolean getCellState(Coordinate c) {
         return liveCells.contains(c);
@@ -74,29 +74,36 @@ public class Board {
      */
     public HashSet<Coordinate> evolve() {
         long startTime = System.nanoTime();
-        HashSet<Coordinate> add = new HashSet<>();
-        HashSet<Coordinate> remove = new HashSet<>();
-        HashSet<Coordinate> tested = new HashSet<>();
+        // cannot change the set that is being iterated over while iterating, so store delta separately
+        HashSet<Coordinate> add = new HashSet<>(); // all cells to be born
+        HashSet<Coordinate> remove = new HashSet<>(); // all cells to be killed
+        HashSet<Coordinate> tested = new HashSet<>(); // keep track of already-checked cells
+        // since a cell can only be born if it's next to a live cell, iterating around live cells is sufficient to catch births
         for (Coordinate c : liveCells) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     Coordinate test = new Coordinate(c.x() + i, c.y() + j);
                     if (tested.add(test)) { // if test is already a member of tested, skip
-                        if (applyRules(test)) {
-                            if (!getCellState(test))
+                        // to be born if...
+                        if (applyRules(test)) { // ...will be alive
+                            if (!getCellState(test)) { // ...and is currently dead
                                 add.add(test);
-                        } else {
-                            if (getCellState(test))
+                            }
+                        // to be killed if...
+                        } else { // ...will be dead
+                            if (getCellState(test)) { // ...and is currently alive
                                 remove.add(test);
+                            }
                         }
                     }
                 }
             }
         }
+        // apply delta
         liveCells.addAll(add);
         liveCells.removeAll(remove);
         genCount++;
-        add.addAll(remove); // overall delta
+        add.addAll(remove); // overall delta to return
         computeTime = System.nanoTime() - startTime;
         return add;
     }
@@ -146,15 +153,16 @@ public class Board {
      * Count the number of live neighbors a cell has
      *
      * @param c the coordinates of the cell
-     * @return  the number of live cells around that cell
+     * @return the number of live cells around that cell
      */
     private int countLiveNeighbors(Coordinate c) {
         int ct = 0;
         // Check every cell around given coordinate
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (getCellState(new Coordinate(c.x() + i, c.y() + j)))
+                if (getCellState(new Coordinate(c.x() + i, c.y() + j))) {
                     ct++;
+                }
             }
         }
         if (getCellState(c)) // don't count the cell itself as a neighbor
@@ -169,8 +177,9 @@ public class Board {
      */
     private static HashSet<Coordinate> deepcopy(HashSet<Coordinate> source) {
         HashSet<Coordinate> copy = new HashSet<>();
-        for (Coordinate c : source)
+        for (Coordinate c : source) {
             copy.add(new Coordinate(c.x(), c.y()));
+        }
         return copy;
     }
 }
