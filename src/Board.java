@@ -78,7 +78,7 @@ public class Board {
         HashSet<Coordinate> add = new HashSet<>(); // all cells to be born
         HashSet<Coordinate> remove = new HashSet<>(); // all cells to be killed
         HashSet<Coordinate> tested = new HashSet<>(); // keep track of already-checked cells
-        // since a cell can only be born if it's next to a live cell, iterating around live cells is sufficient to catch births
+        // since a cell can only be born if it has live neighbors, iterating around live cells is sufficient to catch births
         for (Coordinate c : liveCells) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
@@ -117,7 +117,6 @@ public class Board {
         HashSet<Coordinate> delta = deepcopy(liveCells);
         liveCells.clear();
         genCount = 0;
-        computeTime = 0;
         return delta;
     }
 
@@ -165,8 +164,9 @@ public class Board {
                 }
             }
         }
-        if (getCellState(c)) // don't count the cell itself as a neighbor
+        if (getCellState(c)) {// don't count the cell itself as a neighbor
             ct--;
+        }
         return ct;
     }
 
