@@ -75,24 +75,24 @@ public class Board {
     public HashSet<Coordinate> evolve() {
         long startTime = System.nanoTime();
         // cannot change the set that is being iterated over while iterating, so store delta separately
-        HashSet<Coordinate> add = new HashSet<>(); // all cells to be born
-        HashSet<Coordinate> remove = new HashSet<>(); // all cells to be killed
-        HashSet<Coordinate> tested = new HashSet<>(); // keep track of already-checked cells
+        HashSet<Coordinate> births = new HashSet<>(); // all cells to be born
+        HashSet<Coordinate> deaths = new HashSet<>(); // all cells to be killed
+        HashSet<Coordinate> checked = new HashSet<>(); // keep track of already-checked cells
         // since a cell can only be born if it has live neighbors, iterating around live cells is sufficient to catch births
         for (Coordinate c : liveCells) {
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     Coordinate test = new Coordinate(c.x() + i, c.y() + j);
-                    if (tested.add(test)) { // if test is already a member of tested, skip
+                    if (checked.add(test)) { // if test is already (a member of) checked, skip
                         // to be born if...
-                        if (applyRules(test)) { // ...will be alive
+                        if (applyRules(test)) { // ...will be alive...
                             if (!getCellState(test)) { // ...and is currently dead
-                                add.add(test);
+                                births.add(test);
                             }
                         // to be killed if...
-                        } else { // ...will be dead
+                        } else { // ...will be dead...
                             if (getCellState(test)) { // ...and is currently alive
-                                remove.add(test);
+                                deaths.add(test);
                             }
                         }
                     }
@@ -100,12 +100,12 @@ public class Board {
             }
         }
         // apply delta
-        liveCells.addAll(add);
-        liveCells.removeAll(remove);
+        liveCells.addAll(births);
+        liveCells.removeAll(deaths);
         genCount++;
-        add.addAll(remove); // overall delta to return
+        births.addAll(deaths); // overall delta to return
         computeTime = System.nanoTime() - startTime;
-        return add;
+        return births;
     }
 
     /**

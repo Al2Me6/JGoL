@@ -275,7 +275,24 @@ public class UI extends JFrame {
                 System.exit(1);
             }
             try {
-                return Integer.parseInt(input);
+                int res = Integer.parseInt(input);
+                if (res >= 10) {
+                    return res;
+                }
+                switch (JOptionPane.showConfirmDialog(this, "You have entered an unreasonable value. Are you sure?",
+                        "Warning", JOptionPane.YES_NO_CANCEL_OPTION)) {
+                    case 0: // user insists to continue... expect malfunction
+                        if (JOptionPane.showConfirmDialog(this, "Warning", "Are you REALLY sure?",
+                                JOptionPane.YES_NO_OPTION) == 0) {
+                            return res;
+                        } else {
+                            break;
+                        }
+                    case 1: // show dialog again
+                        break;
+                    case 2: // user clicked cancel
+                        System.exit(1);
+                }
             } catch (NumberFormatException ex) {
                 if (ct++ >= 3) {
                     JOptionPane.showMessageDialog(this, "Too many tries!", "Input Error", JOptionPane.ERROR_MESSAGE);
