@@ -9,8 +9,9 @@ public class UI extends JFrame {
     private int width, height;
     private Board board;
     private ButtonGrid buttonGrid;
-    private final int INITIAL_BUTTON_SIZE = 15;
-    private final Dimension STARTING_SIZE = new Dimension(1400, 900);
+    private static final int INITIAL_BUTTON_SIZE = 15;
+    private static final Dimension STARTING_SIZE = new Dimension(1400, 900);
+    private static final String[] TIME_UNITS = new String[]{"ns", "μs", "ms", "s"};
 
     /**
      * Initialize the JGoL UI, create a board of a user-specified size
@@ -218,7 +219,7 @@ public class UI extends JFrame {
          * Get the most recent compute time
          */
         private void updateComputeTimeLabel() {
-            computeTimeLabel.setText(String.format("Compute time: %,dns", board.getComputeTime()));
+            computeTimeLabel.setText("Compute time: " + formatTime(board.getComputeTime()));
         }
 
         /**
@@ -282,7 +283,7 @@ public class UI extends JFrame {
                 switch (JOptionPane.showConfirmDialog(this, "You have entered an unreasonable value. Are you sure?",
                         "Warning", JOptionPane.YES_NO_CANCEL_OPTION)) {
                     case 0: // user insists to continue... expect malfunction
-                        if (JOptionPane.showConfirmDialog(this, "Warning", "Are you REALLY sure?",
+                        if (JOptionPane.showConfirmDialog(this, "Are you REALLY sure?", "Warning",
                                 JOptionPane.YES_NO_OPTION) == 0) {
                             return res;
                         } else {
@@ -302,5 +303,27 @@ public class UI extends JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    /**
+     * Convert nanoseconds to bigger units as necessary
+     *
+     * @param time original time, in nanoseconds
+     * @return     a string expressing the input in the largest applicable unit of time (with units)
+     */
+    private static String formatTime(long time) {
+        int ct = 0;
+        while (time > 1000000 && ct < 2) {
+            time /= 1000;
+            ct++;
+        }
+        float decimalTime;
+        if (time > 1000) {
+            decimalTime = (float) time / 1000;
+            ct++;
+        } else {
+            decimalTime = time;
+        }
+        return String.format("%,.3f%s", decimalTime, TIME_UNITS[ct]);
     }
 }
