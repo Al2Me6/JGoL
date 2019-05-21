@@ -6,12 +6,12 @@ import java.util.HashSet;
  * Manage UI components
  */
 public class UI extends JFrame {
-    private int width, height;
+    private int MAX_GRID_WIDTH, MAX_GRID_HEIGHT;
     private Board board;
     private ButtonGrid buttonGrid;
     private static final int INITIAL_BUTTON_SIZE = 15;
     private static final Dimension STARTING_SIZE = new Dimension(1400, 900);
-    private static final String[] TIME_UNITS = new String[] { "ns", "μs", "ms", "s" };
+    private static final String[] TIME_UNITS = new String[]{"ns", "μs", "ms", "s"};
     private static final int T_UP = 0;
     private static final int T_DOWN = 1;
     private static final int T_LEFT = 2;
@@ -23,11 +23,11 @@ public class UI extends JFrame {
      */
     public UI() {
         setTitle("JGoL");
-        setIconImage(new ImageIcon("logo.png").getImage());
+        setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
         setLayout(new BorderLayout());
 
-        width = 200;
-        height = 200;
+        MAX_GRID_WIDTH = 200;
+        MAX_GRID_HEIGHT = 200;
 
         board = new Board();
 
@@ -40,16 +40,16 @@ public class UI extends JFrame {
         // buttonNavigationPanel.add(buttonGrid, BorderLayout.CENTER);
 
         JButton leftButton = new JButton("⏪");
-        leftButton.addActionListener(ae -> buttonGrid.updateTransform(T_RIGHT, 4));
+        leftButton.addActionListener(ae -> buttonGrid.updateTransform(T_LEFT, 4));
         buttonNavigationPanel.add(leftButton, BorderLayout.LINE_START);
         JButton rightButton = new JButton("⏩");
-        rightButton.addActionListener(ae -> buttonGrid.updateTransform(T_LEFT, 4));
+        rightButton.addActionListener(ae -> buttonGrid.updateTransform(T_RIGHT, 4));
         buttonNavigationPanel.add(rightButton, BorderLayout.LINE_END);
         JButton upButton = new JButton("⏫");
-        upButton.addActionListener(ae -> buttonGrid.updateTransform(T_DOWN, 4));
+        upButton.addActionListener(ae -> buttonGrid.updateTransform(T_UP, 4));
         buttonNavigationPanel.add(upButton, BorderLayout.NORTH);
         JButton downButton = new JButton("⏬");
-        downButton.addActionListener(ae -> buttonGrid.updateTransform(T_UP, 4));
+        downButton.addActionListener(ae -> buttonGrid.updateTransform(T_DOWN, 4));
         buttonNavigationPanel.add(downButton, BorderLayout.SOUTH);
 
         add(buttonNavigationPanel, BorderLayout.CENTER);
@@ -74,12 +74,12 @@ public class UI extends JFrame {
          * Create a new ButtonGrid with size corresponding to board
          */
         public ButtonGrid() {
-            setLayout(new GridLayout(height, width, -1, -1));
-            buttons = new CellButton[width][height];
+            setLayout(new GridLayout(MAX_GRID_HEIGHT, MAX_GRID_WIDTH, -1, -1));
+            buttons = new CellButton[MAX_GRID_WIDTH][MAX_GRID_HEIGHT];
             // wonky iteration order to translate UI coordinate system to mathematical
             // coordinate system
-            for (int j = height - 1; j >= 0; j--) {
-                for (int i = 0; i < width; i++) {
+            for (int j = MAX_GRID_HEIGHT - 1; j >= 0; j--) {
+                for (int i = 0; i < MAX_GRID_WIDTH; i++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
                     add(buttons[i][j]);
                 }
@@ -145,7 +145,7 @@ public class UI extends JFrame {
         public void buttonRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 Coordinate btnC = board2button(c);
-                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < width && btnC.y() < height) {
+                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < MAX_GRID_WIDTH && btnC.y() < MAX_GRID_HEIGHT) {
                     buttons[(int) btnC.x()][(int) btnC.y()].colorize();
                 }
             }
@@ -155,28 +155,28 @@ public class UI extends JFrame {
             // wipe all currently alive cells from board
             for (Coordinate c : board.getLiveCells()) {
                 Coordinate btnC = board2button(c);
-                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < width && btnC.y() < height) {
+                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < MAX_GRID_WIDTH && btnC.y() < MAX_GRID_HEIGHT) {
                     buttons[(int) btnC.x()][(int) btnC.y()].setBackground(DEAD_COLOR);
                 }
             }
             for (int i = 0; i < increment; i++) {
                 switch (transformPerformed) {
-                case T_UP:
-                    transformY--;
-                    break;
-                case T_DOWN:
-                    transformY++;
-                    break;
-                case T_LEFT:
-                    transformX++;
-                    break;
-                case T_RIGHT:
-                    transformX--;
-                    break;
-                case T_ZERO:
-                    transformX = 0;
-                    transformY = 0;
-                    break;
+                    case T_UP:
+                        transformY++;
+                        break;
+                    case T_DOWN:
+                        transformY--;
+                        break;
+                    case T_LEFT:
+                        transformX--;
+                        break;
+                    case T_RIGHT:
+                        transformX++;
+                        break;
+                    case T_ZERO:
+                        transformX = 0;
+                        transformY = 0;
+                        break;
                 }
             }
             // repopulate board with new transformation
@@ -279,23 +279,23 @@ public class UI extends JFrame {
             // WASD keys for infinite scroll
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
                 char code = Character.toLowerCase(ke.getKeyChar());
-                if (code == 'w' || code == 's' || code == 'd' || code == 'a'|| code == 'z') {
+                if (code == 'w' || code == 's' || code == 'd' || code == 'a' || code == 'z') {
                     switch (code) {
-                    case 'w':
-                        buttonGrid.updateTransform(T_UP, 1);
-                        break;
-                    case 's':
-                        buttonGrid.updateTransform(T_DOWN, 1);
-                        break;
-                    case 'd':
-                        buttonGrid.updateTransform(T_RIGHT, 1);
-                        break;
-                    case 'a':
-                        buttonGrid.updateTransform(T_LEFT, 1);
-                        break;
-                    case 'z':
-                        buttonGrid.updateTransform(T_ZERO, 1);
-                        break;
+                        case 'w':
+                            buttonGrid.updateTransform(T_UP, 1);
+                            break;
+                        case 's':
+                            buttonGrid.updateTransform(T_DOWN, 1);
+                            break;
+                        case 'd':
+                            buttonGrid.updateTransform(T_RIGHT, 1);
+                            break;
+                        case 'a':
+                            buttonGrid.updateTransform(T_LEFT, 1);
+                            break;
+                        case 'z':
+                            buttonGrid.updateTransform(T_ZERO, 1);
+                            break;
                     }
                 }
                 return false;
