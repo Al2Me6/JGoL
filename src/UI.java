@@ -30,10 +30,26 @@ public class UI extends JFrame {
         board = new Board();
 
         buttonGrid = new ButtonGrid();
-        JScrollPane buttonGridScrollBox = new JScrollPane(buttonGrid);
-        buttonGridScrollBox.getHorizontalScrollBar().setUnitIncrement(15);
-        buttonGridScrollBox.getVerticalScrollBar().setUnitIncrement(15);
-        add(buttonGridScrollBox, BorderLayout.CENTER);
+        JPanel buttonNavigationPanel = new JPanel(new BorderLayout());
+        JScrollPane buttonGridScrollBox = new JScrollPane(buttonGrid, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        buttonGridScrollBox.getHorizontalScrollBar().setUnitIncrement(0);
+        buttonGridScrollBox.getVerticalScrollBar().setUnitIncrement(0);
+        buttonNavigationPanel.add(buttonGridScrollBox, BorderLayout.CENTER);
+
+        JButton leftButton = new JButton("⏪");
+        leftButton.addActionListener(ae -> buttonGrid.scroll(T_LEFT, 4));
+        buttonNavigationPanel.add(leftButton, BorderLayout.LINE_START);
+        JButton rightButton = new JButton("⏩");
+        rightButton.addActionListener(ae -> buttonGrid.scroll(T_RIGHT, 4));
+        buttonNavigationPanel.add(rightButton, BorderLayout.LINE_END);
+        JButton upButton = new JButton("⏫");
+        upButton.addActionListener(ae -> buttonGrid.scroll(T_UP, 4));
+        buttonNavigationPanel.add(upButton, BorderLayout.NORTH);
+        JButton downButton = new JButton("⏬");
+        downButton.addActionListener(ae -> buttonGrid.scroll(T_DOWN, 4));
+        buttonNavigationPanel.add(downButton, BorderLayout.SOUTH);
+
+        add(buttonNavigationPanel, BorderLayout.CENTER);
 
         Controls controls = new Controls();
         add(controls, BorderLayout.SOUTH);
@@ -131,7 +147,7 @@ public class UI extends JFrame {
             }
         }
 
-        public void scroll(int transformPerformed) {
+        public void scroll(int transformPerformed, int increments) {
             // wipe all currently alive cells from board
             for (Coordinate c : board.getLiveCells()) {
                 Coordinate btnC = board2button(c);
@@ -139,7 +155,8 @@ public class UI extends JFrame {
                     buttons[(int) btnC.x()][(int) btnC.y()].setBackground(DEAD_COLOR);
                 }
             }
-            switch (transformPerformed) {
+            for (int i = 0; i < increments; i++) {
+                switch (transformPerformed) {
                 case T_UP:
                     transformY--;
                     break;
@@ -152,6 +169,7 @@ public class UI extends JFrame {
                 case T_RIGHT:
                     transformX--;
                     break;
+                }
             }
             // repopulate board with new transformation
             buttonRefresh(board.getLiveCells());
@@ -257,16 +275,16 @@ public class UI extends JFrame {
                 if (code == 'w' || code == 's' || code == 'd' || code == 'a') {
                     switch (code) {
                     case 'w':
-                        buttonGrid.scroll(T_UP);
+                        buttonGrid.scroll(T_UP, 1);
                         break;
                     case 's':
-                        buttonGrid.scroll(T_DOWN);
+                        buttonGrid.scroll(T_DOWN, 1);
                         break;
                     case 'd':
-                        buttonGrid.scroll(T_RIGHT);
+                        buttonGrid.scroll(T_RIGHT, 1);
                         break;
                     case 'a':
-                        buttonGrid.scroll(T_LEFT);
+                        buttonGrid.scroll(T_LEFT, 1);
                         break;
                     }
                 }
