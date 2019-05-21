@@ -11,7 +11,11 @@ public class UI extends JFrame {
     private ButtonGrid buttonGrid;
     private static final int INITIAL_BUTTON_SIZE = 15;
     private static final Dimension STARTING_SIZE = new Dimension(1400, 900);
-    private static final String[] TIME_UNITS = new String[]{"ns", "μs", "ms", "s"};
+    private static final String[] TIME_UNITS = new String[] { "ns", "μs", "ms", "s" };
+    private static final int T_UP = 0;
+    private static final int T_DOWN = 1;
+    private static final int T_LEFT = 2;
+    private static final int T_RIGHT = 3;
 
     /**
      * Initialize the JGoL UI, create a board of a user-specified size
@@ -44,10 +48,8 @@ public class UI extends JFrame {
     private class ButtonGrid extends JPanel {
         private CellButton[][] buttons;
         private int transformX, transformY;
-        private static final int T_UP = 0;
-        private static final int T_DOWN = 1;
-        private static final int T_LEFT = 2;
-        private static final int T_RIGHT = 3;
+        private final Color ALIVE_COLOR = Color.BLACK;
+        private final Color DEAD_COLOR = Color.WHITE;
 
         /**
          * Create a new ButtonGrid with size corresponding to board
@@ -56,6 +58,8 @@ public class UI extends JFrame {
             setLayout(new GridLayout(height, width, -1, -1));
             buttons = new CellButton[width][height];
 
+            // wonky iteration order to translate UI coordinate system to mathematical
+            // coordinate system
             for (int j = height - 1; j >= 0; j--) {
                 for (int i = 0; i < width; i++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
@@ -87,7 +91,6 @@ public class UI extends JFrame {
                 colorize();
                 addActionListener(e -> {
                     board.toggleState(button2board(coordinate));
-                    System.out.println(coordinate);
                     colorize();
                 });
             }
@@ -97,20 +100,11 @@ public class UI extends JFrame {
              * corresponding cell
              */
             public void colorize() {
-                setBackground(board.getCellState(button2board(coordinate)) ? Color.BLACK : Color.WHITE);
+                setBackground(board.getCellState(button2board(coordinate)) ? ALIVE_COLOR : DEAD_COLOR);
             }
-        }
 
-        /**
-         * Synchronize the color of a button according to the state of the corresponding
-         * cell
-         *
-         * @param c coordinate of button to update
-         */
-        public void updateButtonColor(Coordinate c) {
-            // array bounds may overflow here due to architecture of board
-            if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height) {
-                buttons[(int) c.x()][(int) c.y()].colorize();
+            private Coordinate button2board(Coordinate c) {
+                return new Coordinate(c.x() + transformX, c.y() + transformY);
             }
         }
 
@@ -130,73 +124,43 @@ public class UI extends JFrame {
             repaint();
         }
 
-        public void scrollUp() {
-            transformY--;
-            remapCleanup(T_UP);
-        }
-
-        public void scrollDown() {
-            transformY++;
-            remapCleanup(T_DOWN);
-        }
-
-        public void scrollLeft() {
-            transformX++;
-            remapCleanup(T_LEFT);
-        }
-
-        public void scrollRight() {
-            transformX--;
-            remapCleanup(T_RIGHT);
-        }
-
-        private void remapCleanup(int transformPerformed) {
-            switch (transformPerformed) {
-                case T_UP:
-                    break;
-                case T_DOWN:
-                    break;
-                case T_LEFT:
-                    break;
-                case T_RIGHT:
-                    break;
-            }
-            // System.out.println(transformX + ", " + transformY);
-            _refresh();
-        }
-
-        public void refresh(HashSet<Coordinate> delta) {
+        public void buttonRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
-                buttonGrid.updateButtonColor(board2button(c));
-            }
-        }
-
-        private void _refresh() { // internal debugger, inefficient!
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    buttonGrid.updateButtonColor(new Coordinate(i, j));
+                Coordinate btnC = board2button(c);
+                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < width && btnC.y() < height) {
+                    buttons[(int) btnC.x()][(int) btnC.y()].colorize();
                 }
             }
         }
 
-        private Coordinate applyTransform(Coordinate c, int x, int y) {
-            return new Coordinate(c.x() + x, c.y() + y);
-        }
-
-        private HashSet<Coordinate> applyTransformAll(HashSet<Coordinate> hs, int x, int y) {
-            HashSet<Coordinate> transformed = new HashSet<>();
-            for (Coordinate c : hs) {
-                transformed.add(applyTransform(c, x, y));
+        public void scroll(int transformPerformed) {
+            // wipe all currently alive cells from board
+            for (Coordinate c : board.getLiveCells()) {
+                Coordinate btnC = board2button(c);
+                if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < width && btnC.y() < height) {
+                    buttons[(int) btnC.x()][(int) btnC.y()].setBackground(DEAD_COLOR);
+                }
             }
-            return transformed;
-        }
-
-        private Coordinate button2board(Coordinate c) {
-            return applyTransform(c, transformX, transformY);
+            switch (transformPerformed) {
+                case T_UP:
+                    transformY--;
+                    break;
+                case T_DOWN:
+                    transformY++;
+                    break;
+                case T_LEFT:
+                    transformX++;
+                    break;
+                case T_RIGHT:
+                    transformX--;
+                    break;
+            }
+            // repopulate board with new transformation
+            buttonRefresh(board.getLiveCells());
         }
 
         private Coordinate board2button(Coordinate c) {
-            return applyTransform(c, -transformX, -transformY);
+            return new Coordinate(c.x() - transformX, c.y() - transformY);
         }
     }
 
@@ -282,28 +246,29 @@ public class UI extends JFrame {
             computeTimeLabel = new JLabel();
             add(computeTimeLabel);
 
+            uiRefresh();
+
+            // WASD keys for infinite scroll
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
                 char code = Character.toLowerCase(ke.getKeyChar());
                 if (code == 'w' || code == 's' || code == 'd' || code == 'a') {
                     switch (code) {
-                        case 'w':
-                            buttonGrid.scrollUp();
-                            break;
-                        case 's':
-                            buttonGrid.scrollDown();
-                            break;
-                        case 'd':
-                            buttonGrid.scrollRight();
-                            break;
-                        case 'a':
-                            buttonGrid.scrollLeft();
-                            break;
+                    case 'w':
+                        buttonGrid.scroll(T_UP);
+                        break;
+                    case 's':
+                        buttonGrid.scroll(T_DOWN);
+                        break;
+                    case 'd':
+                        buttonGrid.scroll(T_RIGHT);
+                        break;
+                    case 'a':
+                        buttonGrid.scroll(T_LEFT);
+                        break;
                     }
                 }
                 return false;
             });
-
-            uiRefresh();
         }
 
         /**
@@ -348,7 +313,7 @@ public class UI extends JFrame {
          * @param delta HashSet of cells whose status has changed
          */
         private void fullRefresh(HashSet<Coordinate> delta) {
-            buttonGrid.refresh(delta);
+            buttonGrid.buttonRefresh(delta);
             uiRefresh();
         }
 
@@ -361,7 +326,6 @@ public class UI extends JFrame {
             updateComputeTimeLabel();
         }
     }
-
 
     /**
      * Convert nanoseconds to bigger units as necessary
