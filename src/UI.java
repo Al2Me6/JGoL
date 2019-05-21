@@ -16,16 +16,18 @@ public class UI extends JFrame {
     private static final int T_DOWN = 1;
     private static final int T_LEFT = 2;
     private static final int T_RIGHT = 3;
+    private static final int T_ZERO = 4;
 
     /**
      * Initialize the JGoL UI, create a board of a user-specified size
      */
     public UI() {
         setTitle("JGoL");
+        setIconImage(new ImageIcon("logo.png").getImage());
         setLayout(new BorderLayout());
 
-        width = 100;
-        height = 90;
+        width = 200;
+        height = 200;
 
         board = new Board();
 
@@ -35,18 +37,19 @@ public class UI extends JFrame {
         buttonGridScrollBox.getHorizontalScrollBar().setUnitIncrement(0);
         buttonGridScrollBox.getVerticalScrollBar().setUnitIncrement(0);
         buttonNavigationPanel.add(buttonGridScrollBox, BorderLayout.CENTER);
+        // buttonNavigationPanel.add(buttonGrid, BorderLayout.CENTER);
 
         JButton leftButton = new JButton("⏪");
-        leftButton.addActionListener(ae -> buttonGrid.scroll(T_LEFT, 4));
+        leftButton.addActionListener(ae -> buttonGrid.updateTransform(T_RIGHT, 4));
         buttonNavigationPanel.add(leftButton, BorderLayout.LINE_START);
         JButton rightButton = new JButton("⏩");
-        rightButton.addActionListener(ae -> buttonGrid.scroll(T_RIGHT, 4));
+        rightButton.addActionListener(ae -> buttonGrid.updateTransform(T_LEFT, 4));
         buttonNavigationPanel.add(rightButton, BorderLayout.LINE_END);
         JButton upButton = new JButton("⏫");
-        upButton.addActionListener(ae -> buttonGrid.scroll(T_UP, 4));
+        upButton.addActionListener(ae -> buttonGrid.updateTransform(T_DOWN, 4));
         buttonNavigationPanel.add(upButton, BorderLayout.NORTH);
         JButton downButton = new JButton("⏬");
-        downButton.addActionListener(ae -> buttonGrid.scroll(T_DOWN, 4));
+        downButton.addActionListener(ae -> buttonGrid.updateTransform(T_UP, 4));
         buttonNavigationPanel.add(downButton, BorderLayout.SOUTH);
 
         add(buttonNavigationPanel, BorderLayout.CENTER);
@@ -82,7 +85,7 @@ public class UI extends JFrame {
                 }
             }
 
-            zeroTransform();
+            updateTransform(T_ZERO, 1);
         }
 
         /**
@@ -132,6 +135,7 @@ public class UI extends JFrame {
                 for (CellButton b : row) {
                     b.setPreferredSize(new Dimension(size, size));
                     b.setMaximumSize(new Dimension(size, size));
+                    b.setMinimumSize(new Dimension(size, size));
                 }
             }
             revalidate();
@@ -147,7 +151,7 @@ public class UI extends JFrame {
             }
         }
 
-        public void scroll(int transformPerformed, int increments) {
+        public void updateTransform(int transformPerformed, int increment) {
             // wipe all currently alive cells from board
             for (Coordinate c : board.getLiveCells()) {
                 Coordinate btnC = board2button(c);
@@ -155,7 +159,7 @@ public class UI extends JFrame {
                     buttons[(int) btnC.x()][(int) btnC.y()].setBackground(DEAD_COLOR);
                 }
             }
-            for (int i = 0; i < increments; i++) {
+            for (int i = 0; i < increment; i++) {
                 switch (transformPerformed) {
                 case T_UP:
                     transformY--;
@@ -169,15 +173,14 @@ public class UI extends JFrame {
                 case T_RIGHT:
                     transformX--;
                     break;
+                case T_ZERO:
+                    transformX = 0;
+                    transformY = 0;
+                    break;
                 }
             }
             // repopulate board with new transformation
             buttonRefresh(board.getLiveCells());
-        }
-
-        public void zeroTransform() {
-            transformX = 0;
-            transformY = 0;
         }
 
         private Coordinate board2button(Coordinate c) {
@@ -267,24 +270,31 @@ public class UI extends JFrame {
             computeTimeLabel = new JLabel();
             add(computeTimeLabel);
 
+            JButton homeButton = new JButton("Home");
+            homeButton.addActionListener(ae -> buttonGrid.updateTransform(T_ZERO, 1));
+            add(homeButton);
+
             uiRefresh();
 
             // WASD keys for infinite scroll
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
                 char code = Character.toLowerCase(ke.getKeyChar());
-                if (code == 'w' || code == 's' || code == 'd' || code == 'a') {
+                if (code == 'w' || code == 's' || code == 'd' || code == 'a'|| code == 'z') {
                     switch (code) {
                     case 'w':
-                        buttonGrid.scroll(T_UP, 1);
+                        buttonGrid.updateTransform(T_UP, 1);
                         break;
                     case 's':
-                        buttonGrid.scroll(T_DOWN, 1);
+                        buttonGrid.updateTransform(T_DOWN, 1);
                         break;
                     case 'd':
-                        buttonGrid.scroll(T_RIGHT, 1);
+                        buttonGrid.updateTransform(T_RIGHT, 1);
                         break;
                     case 'a':
-                        buttonGrid.scroll(T_LEFT, 1);
+                        buttonGrid.updateTransform(T_LEFT, 1);
+                        break;
+                    case 'z':
+                        buttonGrid.updateTransform(T_ZERO, 1);
                         break;
                     }
                 }
@@ -325,7 +335,7 @@ public class UI extends JFrame {
          */
         private void clearBoard() {
             autoEnabled = false;
-            buttonGrid.zeroTransform();
+            buttonGrid.updateTransform(T_ZERO, 1);
             fullRefresh(board.clear());
         }
 

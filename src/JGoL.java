@@ -10,7 +10,7 @@ public class JGoL {
     public static void main(String[] args) {
         try {
             // certain OS-specifics LaFs break custom button coloring
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
