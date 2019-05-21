@@ -49,6 +49,10 @@ public class Board {
         setCellState(c, !getCellState(c));
     }
 
+    public HashSet<Coordinate> getLiveCells() {
+        return liveCells;
+    }
+
     /**
      * Getter for generation count
      *
@@ -127,7 +131,7 @@ public class Board {
      */
     private boolean applyRules(Coordinate c) {
         int count = countLiveNeighbors(c);
-        if (liveCells.contains(c)) { // cell is alive
+        if (getCellState(c)) { // cell is alive
             switch (count) {
                 // death by solitude
                 case 0:

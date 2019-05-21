@@ -20,8 +20,8 @@ public class UI extends JFrame {
         setTitle("JGoL");
         setLayout(new BorderLayout());
 
-        width = userInput("Board width:");
-        height = userInput("Board height");
+        width = 100;
+        height = 90;
 
         board = new Board();
 
@@ -43,19 +43,28 @@ public class UI extends JFrame {
      */
     private class ButtonGrid extends JPanel {
         private CellButton[][] buttons;
+        private int transformX, transformY;
+        private static final int T_UP = 0;
+        private static final int T_DOWN = 1;
+        private static final int T_LEFT = 2;
+        private static final int T_RIGHT = 3;
 
         /**
          * Create a new ButtonGrid with size corresponding to board
          */
         public ButtonGrid() {
             setLayout(new GridLayout(height, width, -1, -1));
-            buttons = new CellButton[height][width];
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
+            buttons = new CellButton[width][height];
+
+            for (int j = height - 1; j >= 0; j--) {
+                for (int i = 0; i < width; i++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
                     add(buttons[i][j]);
                 }
             }
+
+            transformX = 0;
+            transformY = 0;
         }
 
         /**
@@ -77,26 +86,32 @@ public class UI extends JFrame {
                 setOpaque(true);
                 colorize();
                 addActionListener(e -> {
-                    board.toggleState(coordinate);
+                    board.toggleState(button2board(coordinate));
+                    System.out.println(coordinate);
                     colorize();
                 });
             }
 
             /**
-             * Synchronize the color of the button according to the state of the corresponding cell
+             * Synchronize the color of the button according to the state of the
+             * corresponding cell
              */
             public void colorize() {
-                setBackground(board.getCellState(coordinate) ? Color.BLACK : Color.WHITE);
+                setBackground(board.getCellState(button2board(coordinate)) ? Color.BLACK : Color.WHITE);
             }
         }
 
         /**
-         * Synchronize the color of a button according to the state of the corresponding cell
+         * Synchronize the color of a button according to the state of the corresponding
+         * cell
          *
          * @param c coordinate of button to update
          */
         public void updateButtonColor(Coordinate c) {
-            buttons[c.x()][c.y()].colorize();
+            // array bounds may overflow here due to architecture of board
+            if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height) {
+                buttons[(int) c.x()][(int) c.y()].colorize();
+            }
         }
 
         /**
@@ -113,6 +128,75 @@ public class UI extends JFrame {
             }
             revalidate();
             repaint();
+        }
+
+        public void scrollUp() {
+            transformY--;
+            remapCleanup(T_UP);
+        }
+
+        public void scrollDown() {
+            transformY++;
+            remapCleanup(T_DOWN);
+        }
+
+        public void scrollLeft() {
+            transformX++;
+            remapCleanup(T_LEFT);
+        }
+
+        public void scrollRight() {
+            transformX--;
+            remapCleanup(T_RIGHT);
+        }
+
+        private void remapCleanup(int transformPerformed) {
+            switch (transformPerformed) {
+                case T_UP:
+                    break;
+                case T_DOWN:
+                    break;
+                case T_LEFT:
+                    break;
+                case T_RIGHT:
+                    break;
+            }
+            // System.out.println(transformX + ", " + transformY);
+            _refresh();
+        }
+
+        public void refresh(HashSet<Coordinate> delta) {
+            for (Coordinate c : delta) {
+                buttonGrid.updateButtonColor(board2button(c));
+            }
+        }
+
+        private void _refresh() { // internal debugger, inefficient!
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    buttonGrid.updateButtonColor(new Coordinate(i, j));
+                }
+            }
+        }
+
+        private Coordinate applyTransform(Coordinate c, int x, int y) {
+            return new Coordinate(c.x() + x, c.y() + y);
+        }
+
+        private HashSet<Coordinate> applyTransformAll(HashSet<Coordinate> hs, int x, int y) {
+            HashSet<Coordinate> transformed = new HashSet<>();
+            for (Coordinate c : hs) {
+                transformed.add(applyTransform(c, x, y));
+            }
+            return transformed;
+        }
+
+        private Coordinate button2board(Coordinate c) {
+            return applyTransform(c, transformX, transformY);
+        }
+
+        private Coordinate board2button(Coordinate c) {
+            return applyTransform(c, -transformX, -transformY);
         }
     }
 
@@ -198,6 +282,27 @@ public class UI extends JFrame {
             computeTimeLabel = new JLabel();
             add(computeTimeLabel);
 
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(ke -> {
+                char code = Character.toLowerCase(ke.getKeyChar());
+                if (code == 'w' || code == 's' || code == 'd' || code == 'a') {
+                    switch (code) {
+                        case 'w':
+                            buttonGrid.scrollUp();
+                            break;
+                        case 's':
+                            buttonGrid.scrollDown();
+                            break;
+                        case 'd':
+                            buttonGrid.scrollRight();
+                            break;
+                        case 'a':
+                            buttonGrid.scrollLeft();
+                            break;
+                    }
+                }
+                return false;
+            });
+
             uiRefresh();
         }
 
@@ -243,12 +348,7 @@ public class UI extends JFrame {
          * @param delta HashSet of cells whose status has changed
          */
         private void fullRefresh(HashSet<Coordinate> delta) {
-            for (Coordinate c : delta) {
-                // array bounds may overflow here due to architecture of board
-                if (c.x() >= 0 && c.y() >= 0 && c.x() < width && c.y() < height) {
-                    buttonGrid.updateButtonColor(c);
-                }
-            }
+            buttonGrid.refresh(delta);
             uiRefresh();
         }
 
@@ -262,54 +362,12 @@ public class UI extends JFrame {
         }
     }
 
-    /**
-     * Asks the user a question, checking input
-     *
-     * @param question question to ask user
-     * @return user's response
-     */
-    private int userInput(String question) {
-        int ct = 0;
-        while (true) {
-            String input = JOptionPane.showInputDialog(this, question);
-            if (input == null) { // user clicked cancel
-                System.exit(1);
-            }
-            try {
-                int res = Integer.parseInt(input);
-                if (res >= 10) {
-                    return res;
-                }
-                switch (JOptionPane.showConfirmDialog(this, "You have entered an unreasonable value. Are you sure?",
-                        "Warning", JOptionPane.YES_NO_CANCEL_OPTION)) {
-                    case 0: // user insists to continue... expect malfunction
-                        if (JOptionPane.showConfirmDialog(this, "Are you REALLY sure?", "Warning",
-                                JOptionPane.YES_NO_OPTION) == 0) {
-                            return res;
-                        } else {
-                            break;
-                        }
-                    case 1: // show dialog again
-                        break;
-                    case 2: // user clicked cancel
-                        System.exit(1);
-                }
-            } catch (NumberFormatException ex) {
-                if (ct++ >= 3) {
-                    JOptionPane.showMessageDialog(this, "Too many tries!", "Input Error", JOptionPane.ERROR_MESSAGE);
-                    System.exit(1);
-                }
-                JOptionPane.showMessageDialog(this, "Please input a valid integer!", "Input Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
 
     /**
      * Convert nanoseconds to bigger units as necessary
      *
      * @param time original time, in nanoseconds
-     * @return     a string expressing the input in the largest applicable unit of time (with units)
+     * @return a string expressing the input in the largest applicable unit of time
      */
     private static String formatTime(long time) {
         int ct = 0;

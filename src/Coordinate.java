@@ -1,7 +1,7 @@
 import java.util.Objects;
 
 public class Coordinate {
-    private final int xCoordinate, yCoordinate;
+    private final long xCoordinate, yCoordinate;
 
     /**
      * Create a new coordinate at (x, y)
@@ -9,7 +9,7 @@ public class Coordinate {
      * @param x x-coordinate
      * @param y y-coordinate
      */
-    public Coordinate(int x, int y) {
+    public Coordinate(long x, long y) {
         xCoordinate = x;
         yCoordinate = y;
     }
@@ -19,7 +19,7 @@ public class Coordinate {
      *
      * @return x-coordinate
      */
-    public int x() {
+    public long x() {
         return xCoordinate;
     }
 
@@ -28,7 +28,7 @@ public class Coordinate {
      *
      * @return y y-coordinate
      */
-    public int y() {
+    public long y() {
         return yCoordinate;
     }
 
