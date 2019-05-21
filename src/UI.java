@@ -57,7 +57,6 @@ public class UI extends JFrame {
         public ButtonGrid() {
             setLayout(new GridLayout(height, width, -1, -1));
             buttons = new CellButton[width][height];
-
             // wonky iteration order to translate UI coordinate system to mathematical
             // coordinate system
             for (int j = height - 1; j >= 0; j--) {
@@ -67,8 +66,7 @@ public class UI extends JFrame {
                 }
             }
 
-            transformX = 0;
-            transformY = 0;
+            zeroTransform();
         }
 
         /**
@@ -157,6 +155,11 @@ public class UI extends JFrame {
             }
             // repopulate board with new transformation
             buttonRefresh(board.getLiveCells());
+        }
+
+        public void zeroTransform() {
+            transformX = 0;
+            transformY = 0;
         }
 
         private Coordinate board2button(Coordinate c) {
@@ -304,6 +307,7 @@ public class UI extends JFrame {
          */
         private void clearBoard() {
             autoEnabled = false;
+            buttonGrid.zeroTransform();
             fullRefresh(board.clear());
         }
 
