@@ -123,7 +123,7 @@ public class Board {
      * @return HashSet of cells whose status has changed
      */
     public HashSet<Coordinate> clear() {
-        HashSet<Coordinate> delta = deepcopy(liveCells);
+        HashSet<Coordinate> delta = DeepCopy(liveCells);
         liveCells.clear();
         genCount = 0;
         return delta;
@@ -184,7 +184,7 @@ public class Board {
      *
      * @return a copy of the original HashSet
      */
-    private static HashSet<Coordinate> deepcopy(HashSet<Coordinate> source) {
+    private static HashSet<Coordinate> DeepCopy(HashSet<Coordinate> source) {
         HashSet<Coordinate> copy = new HashSet<>();
         for (Coordinate c : source) {
             copy.add(new Coordinate(c.x(), c.y()));

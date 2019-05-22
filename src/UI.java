@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.HashSet;
 
@@ -112,7 +113,7 @@ public class UI extends JFrame {
             /**
              * Synchronize the color of the button according to the state of the corresponding cell
              */
-            public void colorize() {
+            private void colorize() {
                 setBackground(board.getCellState(button2board(coordinate)) ? ALIVE_COLOR : DEAD_COLOR);
             }
 
@@ -126,7 +127,7 @@ public class UI extends JFrame {
          *
          * @param size new size to be set
          */
-        public void updateButtonSize(int size) {
+        private void updateButtonSize(int size) {
             for (CellButton[] row : buttons) {
                 for (CellButton b : row) {
                     b.setPreferredSize(new Dimension(size, size));
@@ -143,7 +144,7 @@ public class UI extends JFrame {
          *
          * @param delta HashSet of changed coordinates
          */
-        public void buttonRefresh(HashSet<Coordinate> delta) {
+        private void buttonRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 Coordinate btnC = board2button(c);
                 if (btnC.x() >= 0 && btnC.y() >= 0 && btnC.x() < MAX_GRID_WIDTH && btnC.y() < MAX_GRID_HEIGHT) {
@@ -158,7 +159,7 @@ public class UI extends JFrame {
          * @param transformPerformed the id of the type of transportation that is to be performed
          * @param increment the size of the transformation to be performed
          */
-        public void updateTransform(int transformPerformed, int increment) {
+        private void updateTransform(int transformPerformed, int increment) {
             // wipe all currently alive cells from board
             for (Coordinate c : board.getLiveCells()) {
                 Coordinate btnC = board2button(c);
@@ -218,6 +219,7 @@ public class UI extends JFrame {
          */
         public Controls() {
             setLayout(new FlowLayout());
+            setBorder(new EmptyBorder(0, 0, 50, 0));
 
             // display current generation count
             genCounter = new JLabel();
