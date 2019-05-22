@@ -27,7 +27,6 @@ At the very beginning, the user will choose the initially populated cells using 
 | ![image2](/img/2.png) | ![image3](/img/3.png) | The cells at the top and bottom have only one neighbor, so they are removed. A cell is added in the middle, as it has three neighbors (top, bottom, right). The cell at the right stays as it has two neighboring cells (top and bottom).
 | ![image4](/img/4.png) | ![image5](/img/5.png) | For each “rod” of the initial shape, the following occurs: the top and bottom of the rod have no neighbors, so they die, while the left and right of the middle generate a new cell, as the whole rod serves as three neighbors. By doing this to each rod, the resultant pattern is generated. |
 | ![image5](/img/5.png) | ![image4](/img/4.png) | If an "evolution" is made from the previous new generation show above, we arrive at the initial shape shown. This is an example of a cyclic pattern, whose shape repeats over generations in potentially different positions.
-| ![image6](/img/6.png) | ![image7](/img/7.png) | When a cell goes past the boundaries of the grid (which are specified by the user), the cell is ignored and has no effect on other cells. In this image, the orange represents an out of bounds section.
 
 ## Pseudocode
 
