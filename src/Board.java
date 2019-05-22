@@ -49,6 +49,11 @@ public class Board {
         setCellState(c, !getCellState(c));
     }
 
+    /**
+     * Getter for currently living cells
+     *
+     * @return HashSet of live cells
+     */
     public HashSet<Coordinate> getLiveCells() {
         return liveCells;
     }

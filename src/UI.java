@@ -6,7 +6,6 @@ import java.util.HashSet;
  * Manage UI components
  */
 public class UI extends JFrame {
-    private int MAX_GRID_WIDTH, MAX_GRID_HEIGHT;
     private Board board;
     private ButtonGrid buttonGrid;
     private static final int INITIAL_BUTTON_SIZE = 15;
@@ -25,9 +24,6 @@ public class UI extends JFrame {
         setTitle("JGoL");
         setIconImage(new ImageIcon(getClass().getResource("logo.png")).getImage());
         setLayout(new BorderLayout());
-
-        MAX_GRID_WIDTH = 200;
-        MAX_GRID_HEIGHT = 200;
 
         board = new Board();
 
@@ -67,6 +63,8 @@ public class UI extends JFrame {
     private class ButtonGrid extends JPanel {
         private CellButton[][] buttons;
         private int transformX, transformY;
+        private static final int MAX_GRID_WIDTH = 200;
+        private static final int MAX_GRID_HEIGHT = 200;
         private final Color ALIVE_COLOR = Color.BLACK;
         private final Color DEAD_COLOR = Color.WHITE;
 
@@ -76,8 +74,7 @@ public class UI extends JFrame {
         public ButtonGrid() {
             setLayout(new GridLayout(MAX_GRID_HEIGHT, MAX_GRID_WIDTH, -1, -1));
             buttons = new CellButton[MAX_GRID_WIDTH][MAX_GRID_HEIGHT];
-            // wonky iteration order to translate UI coordinate system to mathematical
-            // coordinate system
+            // wonky iteration order to translate UI coordinate system to mathematical coordinate system
             for (int j = MAX_GRID_HEIGHT - 1; j >= 0; j--) {
                 for (int i = 0; i < MAX_GRID_WIDTH; i++) {
                     buttons[i][j] = new CellButton(new Coordinate(i, j), INITIAL_BUTTON_SIZE);
@@ -113,8 +110,7 @@ public class UI extends JFrame {
             }
 
             /**
-             * Synchronize the color of the button according to the state of the
-             * corresponding cell
+             * Synchronize the color of the button according to the state of the corresponding cell
              */
             public void colorize() {
                 setBackground(board.getCellState(button2board(coordinate)) ? ALIVE_COLOR : DEAD_COLOR);
@@ -142,6 +138,11 @@ public class UI extends JFrame {
             repaint();
         }
 
+        /**
+         * Refresh button colors
+         *
+         * @param delta HashSet of changed coordinates
+         */
         public void buttonRefresh(HashSet<Coordinate> delta) {
             for (Coordinate c : delta) {
                 Coordinate btnC = board2button(c);
@@ -151,6 +152,12 @@ public class UI extends JFrame {
             }
         }
 
+        /**
+         * Stage the parameters for the transformations on the board
+         *
+         * @param transformPerformed the id of the type of transportation that is to be performed
+         * @param increment the size of the transformation to be performed
+         */
         public void updateTransform(int transformPerformed, int increment) {
             // wipe all currently alive cells from board
             for (Coordinate c : board.getLiveCells()) {
@@ -183,6 +190,12 @@ public class UI extends JFrame {
             buttonRefresh(board.getLiveCells());
         }
 
+        /**
+         * Convert the coordinates on the board to the coordinates associated with the button
+         *
+         * @param c the coordinates on the board
+         * @return the coordinate associated with the button
+         */
         private Coordinate board2button(Coordinate c) {
             return new Coordinate(c.x() - transformX, c.y() - transformY);
         }
