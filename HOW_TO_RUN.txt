@@ -1,2 +1,1 @@
-To run JGoL:
-First navigate to ./src, and compile and run JGoL.java with Java 8.
+To run JGoL, first navigate to ./src, then compile and run JGoL.java with Java 8.
