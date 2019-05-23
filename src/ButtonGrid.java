@@ -3,7 +3,7 @@ import java.awt.*;
 import java.util.HashSet;
 
 /**
- * A grid of buttons corresponding to cells
+ * Display a grid of buttons corresponding to cells
  */
 public class ButtonGrid extends JPanel {
     private Board board;
@@ -12,6 +12,8 @@ public class ButtonGrid extends JPanel {
 
     /**
      * Create a new ButtonGrid with size corresponding to board
+     *
+     * @param board: the board to display
      */
     public ButtonGrid(Board board) {
         this.board = board;
