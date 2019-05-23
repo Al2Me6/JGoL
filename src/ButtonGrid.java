@@ -5,7 +5,7 @@ import java.util.HashSet;
 /**
  * A grid of buttons corresponding to cells
  */
-class ButtonGrid extends JPanel {
+public class ButtonGrid extends JPanel {
     private Board board;
     private CellButton[][] buttons;
     private int transformX, transformY;
