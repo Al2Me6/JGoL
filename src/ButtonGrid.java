@@ -18,8 +18,7 @@ public class ButtonGrid extends JPanel {
 
         setLayout(new GridLayout(Consts.MAX_GRID_HEIGHT, Consts.MAX_GRID_WIDTH, -1, -1));
         buttons = new CellButton[Consts.MAX_GRID_WIDTH][Consts.MAX_GRID_HEIGHT];
-        // wonky iteration order to translate UI coordinate system to mathematical
-        // coordinate system
+        // wonky iteration order to translate from Cartesian to UI coordinate system
         for (int j = Consts.MAX_GRID_HEIGHT - 1; j >= 0; j--) {
             for (int i = 0; i < Consts.MAX_GRID_WIDTH; i++) {
                 buttons[i][j] = new CellButton(new Coordinate(i, j), Consts.INITIAL_BUTTON_SIZE);
@@ -27,16 +26,6 @@ public class ButtonGrid extends JPanel {
             }
         }
         updateTransform(Consts.T_ZERO);
-    }
-
-    @Override
-    public Dimension getMaximumSize() {
-        return getPreferredSize();
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return getPreferredSize();
     }
 
     /**
@@ -48,8 +37,6 @@ public class ButtonGrid extends JPanel {
         for (CellButton[] row : buttons) {
             for (CellButton b : row) {
                 b.setPreferredSize(new Dimension(size, size));
-                b.setMaximumSize(new Dimension(size, size));
-                b.setMinimumSize(new Dimension(size, size));
             }
         }
         revalidate();
@@ -73,11 +60,9 @@ public class ButtonGrid extends JPanel {
     /**
      * Stage the parameters for the transformations on the board
      *
-     * @param transformPerformed the id of the type of transportation that is to be
-     *                           performed
-     * @param increment          the size of the transformation to be performed
+     * @param transform the id of the type of transportation that is to be performed
      */
-    public void updateTransform(int transformPerformed) {
+    public void updateTransform(int transform) {
         // wipe all currently alive cells from board
         for (Coordinate c : board.getLiveCells()) {
             Coordinate btnC = board2button(c);
@@ -86,32 +71,31 @@ public class ButtonGrid extends JPanel {
             }
         }
         for (int i = 0; i < Consts.SCROLL_INCREMENT; i++) {
-            switch (transformPerformed) {
-            case Consts.T_UP:
-                transformY++;
-                break;
-            case Consts.T_DOWN:
-                transformY--;
-                break;
-            case Consts.T_LEFT:
-                transformX--;
-                break;
-            case Consts.T_RIGHT:
-                transformX++;
-                break;
-            case Consts.T_ZERO:
-                transformX = 0;
-                transformY = 0;
-                break;
+            switch (transform) {
+                case Consts.T_UP:
+                    transformY++;
+                    break;
+                case Consts.T_DOWN:
+                    transformY--;
+                    break;
+                case Consts.T_RIGHT:
+                    transformX++;
+                    break;
+                case Consts.T_LEFT:
+                    transformX--;
+                    break;
+                case Consts.T_ZERO:
+                    transformX = 0;
+                    transformY = 0;
+                    break;
             }
         }
-        // repopulate board with new transformation
+        // repopulate board using new transformation
         buttonRefresh(board.getLiveCells());
     }
 
     /**
-     * Convert the coordinates on the board to the coordinates associated with the
-     * button
+     * Convert the coordinates on the board to the coordinates associated with the button
      *
      * @param c the coordinates on the board
      * @return the coordinate associated with the button
@@ -152,6 +136,12 @@ public class ButtonGrid extends JPanel {
             setBackground(board.getCellState(button2board(coordinate)) ? Consts.ALIVE_COLOR : Consts.DEAD_COLOR);
         }
 
+        /**
+         * Convert the coordinates of the button to the coordinates on the board
+         *
+         * @param c the coordinates of the button
+         * @return the coordinates on the board
+         */
         private Coordinate button2board(Coordinate c) {
             return new Coordinate(c.x() + transformX, c.y() + transformY);
         }

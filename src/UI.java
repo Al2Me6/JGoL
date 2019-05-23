@@ -22,6 +22,7 @@ public class UI extends JFrame {
         board = new Board();
         buttonGrid = new ButtonGrid(board);
 
+        // board, with extra navigation (scroll) buttons
         JPanel gameBoard = new JPanel(new BorderLayout());
         // hide buttons that don't currently fit on screen because of zoom setting
         JScrollPane buttonGridOverflow = new JScrollPane(buttonGrid, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -54,21 +55,21 @@ public class UI extends JFrame {
             if (ke.getID() == KeyEvent.KEY_TYPED) {
                 char code = Character.toLowerCase(ke.getKeyChar());
                 switch (code) {
-                case 'w':
-                    buttonGrid.updateTransform(Consts.T_UP);
-                    break;
-                case 's':
-                    buttonGrid.updateTransform(Consts.T_DOWN);
-                    break;
-                case 'd':
-                    buttonGrid.updateTransform(Consts.T_RIGHT);
-                    break;
-                case 'a':
-                    buttonGrid.updateTransform(Consts.T_LEFT);
-                    break;
-                case 'z':
-                    buttonGrid.updateTransform(Consts.T_ZERO);
-                    break;
+                    case 'w':
+                        buttonGrid.updateTransform(Consts.T_UP);
+                        break;
+                    case 's':
+                        buttonGrid.updateTransform(Consts.T_DOWN);
+                        break;
+                    case 'd':
+                        buttonGrid.updateTransform(Consts.T_RIGHT);
+                        break;
+                    case 'a':
+                        buttonGrid.updateTransform(Consts.T_LEFT);
+                        break;
+                    case 'z':
+                        buttonGrid.updateTransform(Consts.T_ZERO);
+                        break;
                 }
             }
             return true;
@@ -83,7 +84,7 @@ public class UI extends JFrame {
         private JLabel genCounter;
         private JLabel computeTimeLabel;
         private boolean autoEnabled = false;
-        private int autoDelay = 705;
+        private int autoDelay = 700;
 
         /**
          * Initialize all control elements
@@ -138,26 +139,26 @@ public class UI extends JFrame {
             controlsPanel.add(homeButton);
             add(controlsPanel);
 
-            // change UI styling
-            JPanel stylingPanel = new JPanel(new FlowLayout());
+            // sliders
+            JPanel slidersPanel = new JPanel(new FlowLayout());
             // change autoevolve speed
-            stylingPanel.add(new JLabel("Autoevolve speed:"));
+            slidersPanel.add(new JLabel("Autoevolve speed:"));
             JSlider autoSpeedSlider = new JSlider(JSlider.HORIZONTAL, Consts.AUTO_DELAY_MIN, Consts.AUTO_DELAY_MAX, autoDelay);
             autoSpeedSlider.setMinorTickSpacing(50);
             autoSpeedSlider.setMajorTickSpacing(200);
             autoSpeedSlider.setPaintTicks(true);
             autoSpeedSlider.addChangeListener(ce -> autoDelay = ((JSlider) ce.getSource()).getValue());
-            stylingPanel.add(autoSpeedSlider);
+            slidersPanel.add(autoSpeedSlider);
             // change button size, aka zoom
-            stylingPanel.add(new JLabel("Zoom:"));
-            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, 5, 20, Consts.INITIAL_BUTTON_SIZE);
+            slidersPanel.add(new JLabel("Zoom:"));
+            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, Consts.ZOOM_MAX, Consts.ZOOM_MAX, Consts.INITIAL_BUTTON_SIZE);
             zoomSlider.setMinorTickSpacing(1);
             zoomSlider.setMajorTickSpacing(5);
             zoomSlider.setPaintTicks(true);
             zoomSlider.setPaintLabels(true);
             zoomSlider.addChangeListener(ce -> buttonGrid.updateButtonSize(((JSlider) ce.getSource()).getValue()));
-            stylingPanel.add(zoomSlider);
-            add(stylingPanel);
+            slidersPanel.add(zoomSlider);
+            add(slidersPanel);
 
             uiRefresh();
         }
