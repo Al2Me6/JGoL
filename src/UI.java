@@ -151,7 +151,7 @@ public class UI extends JFrame {
             slidersPanel.add(autoSpeedSlider);
             // change button size, aka zoom
             slidersPanel.add(new JLabel("Zoom:"));
-            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, Consts.ZOOM_MAX, Consts.ZOOM_MAX, Consts.INITIAL_BUTTON_SIZE);
+            JSlider zoomSlider = new JSlider(JSlider.HORIZONTAL, Consts.ZOOM_MIN, Consts.ZOOM_MAX, Consts.INITIAL_BUTTON_SIZE);
             zoomSlider.setMinorTickSpacing(1);
             zoomSlider.setMajorTickSpacing(5);
             zoomSlider.setPaintTicks(true);
